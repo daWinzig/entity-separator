@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.dawinzig.entityseparator.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+  ],
+  "client": [
+    "NameTagMixin",
+    "TextureMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

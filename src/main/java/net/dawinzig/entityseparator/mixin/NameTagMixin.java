@@ -1,0 +1,43 @@
+package net.dawinzig.entityseparator.mixin;
+
+import net.dawinzig.entityseparator.EntitySeparator;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.nbt.*;
+import net.minecraft.text.Text;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(EntityRenderer.class)
+public abstract class NameTagMixin<T extends Entity> {
+	@Shadow protected abstract void renderLabelIfPresent(T entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light);
+
+	@ModifyVariable(method = "renderLabelIfPresent", at = @At("STORE"), ordinal = 0)
+	private double d(double x) {
+		return 0.0;
+	}
+
+	@Inject(at = @At("HEAD"), method = "render", cancellable = true)
+	public void render(T entity, float yaw, float tickDelta, MatrixStack matrices,
+					   VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+		double d = MinecraftClient.getInstance().gameRenderer.getCamera().getPos()
+				.squaredDistanceTo(entity.getPos());
+		NbtCompound nbt = entity.writeNbt(new NbtCompound());
+		EntitySeparator.RULES.values().forEach(rule -> {
+			if (rule.isEnabled() && rule.containsEntityType(entity.getType())) {
+				if (rule.shouldRenderNameTag(nbt, d)) {
+					this.renderLabelIfPresent(entity, rule.getLabel(entity, nbt), matrices, vertexConsumers, light);
+					ci.cancel();
+				}
+			}
+		});
+		if (d > 4096.0) ci.cancel();
+	}
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "entityseparator",
+  "version": "${version}",
+
+  "name": "Entity Separator",
+  "description": "Visually separates your Entities by NBT-Data!",
+  "authors": [
+    "daWinzig"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/entity-separator",
+    "sources": "https://github.com/daWinzig/entity-separator",
+    "issues": "https://github.com/daWinzig/entity-separator/issues"
+  },
+
+  "license": "GPLv3",
+  "icon": "assets/entityseparator/icon.png",
+
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.dawinzig.entityseparator.EntitySeparator"
+    ],
+    "modmenu": [
+      "net.dawinzig.entityseparator.ModMenu"
+    ]
+  },
+  "mixins": [
+    "entityseparator.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.22",
+    "fabric": "*",
+    "minecraft": "~1.20",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

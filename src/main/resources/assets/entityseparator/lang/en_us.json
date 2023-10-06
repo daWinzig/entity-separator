@@ -1,0 +1,38 @@
+{
+  "entityseparator.category.main": "Entity Separator",
+  "entityseparator.key.menu": "Open Menu",
+
+  "entityseparator.toast.reload": "\"%s\" reloaded!",
+  "entityseparator.toast.delete.success": "Deleted",
+  "entityseparator.toast.delete.failed": "Deletion failed...",
+
+  "entityseparator.toggle.narrator": "toggle %s is %s",
+  "entityseparator.slider.narrator": "slider %s has the value %s",
+
+  "entityseparator.button.editordelete": "Edit/Delete...",
+  "entityseparator.button.editordelete.narrator": "edit or delete",
+  "entityseparator.button.reload": "Reload",
+  "entityseparator.button.reset": "Reset",
+  "entityseparator.button.delete": "Delete",
+  "entityseparator.button.open": "Open Folder...",
+
+  "entityseparator.list.title": "Separator Rules",
+  "entityseparator.list.button.add": "Add New...",
+  "entityseparator.list.button.options": "Configure...",
+
+  "entityseparator.settings.title": "Entity Separator Options",
+
+  "entityseparator.add.title": "New Rule",
+  "entityseparator.edit.title": "Edit Rule",
+
+  "entityseparator.rule.name": "Name",
+  "entityseparator.rule.entities": "Entity Types",
+  "entityseparator.rule.path": "Target Path",
+  "entityseparator.rule.compare": "Compare against",
+  "entityseparator.rule.compare.tooltip": "leave blank to check path existence",
+  "entityseparator.rule.pattern": "Pattern without Name",
+  "entityseparator.rule.pattern.name": "Pattern with Name",
+  "entityseparator.rule.distance": "Max Distance",
+  "entityseparator.rule.texture": "Custom Texture",
+  "entityseparator.rule.texture.tooltip": "leave blank for default"
+}
