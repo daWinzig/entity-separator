@@ -128,7 +128,6 @@ public class Config {
             rule.setCompare("1b");
             rule.setMaxDistance(32);
             rule.setLabelPattern("&6Screaming Goat");
-            rule.setLabelPatternWithName("&6{name}");
             rule.setTexture("entityseparator:textures/entity/goat/screaming_goat.png");
             return rule;
         }
@@ -140,7 +139,6 @@ public class Config {
             rule.setCompare("");
             rule.setMaxDistance(8);
             rule.setLabelPattern("&6({MainGene}, {HiddenGene})");
-            rule.setLabelPatternWithName("{name} &6({MainGene}, {HiddenGene})");
             return rule;
         }
         public static Rule getLlamaStrengthRule() {
@@ -151,7 +149,6 @@ public class Config {
             rule.setCompare("4; 5");
             rule.setMaxDistance(32);
             rule.setLabelPattern("&6Strength: {Strength}");
-            rule.setLabelPatternWithName("{name} &6({Strength})");
             return rule;
         }
     }

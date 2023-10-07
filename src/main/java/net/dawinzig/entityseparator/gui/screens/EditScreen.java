@@ -155,20 +155,6 @@ public class EditScreen extends Screen {
                 }
         );
         listWidget.addEntry(
-                Text.translatable("entityseparator.rule.pattern.name"), null,
-                rule.getLabelPatternWithName(), rule.getLabelPatternWithName(),
-                ListWidget.FunctionEnable.ON_CHANGED,
-                new Identifier("entityseparator", "reset"),
-                Text.translatable("entityseparator.button.reset"),
-                Text.translatable("entityseparator.button.reset.narrator"),
-                ListWidget.Entry::reset,
-                entry -> this.rule.setLabelPatternWithName(entry.getValue()),
-                entry -> {
-                    entry.setValid(!entry.getValue().isEmpty());
-                    this.updateDoneEnabled();
-                }
-        );
-        listWidget.addEntry(
                 Text.translatable("entityseparator.rule.distance"), null,
                 rule.getMaxDistance(), rule.getMaxDistance(), 1, 128,
                 ListWidget.FunctionEnable.ON_CHANGED,

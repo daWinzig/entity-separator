@@ -15,9 +15,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Mixin(EntityRenderer.class)
 public abstract class NameTagMixin<T extends Entity> {
 	@Shadow protected abstract void renderLabelIfPresent(T entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light);
+	@Shadow protected abstract boolean hasLabel(T entity);
 
 	@ModifyVariable(method = "renderLabelIfPresent", at = @At("STORE"), ordinal = 0)
 	private double d(double x) {
@@ -30,14 +34,29 @@ public abstract class NameTagMixin<T extends Entity> {
 		double d = MinecraftClient.getInstance().gameRenderer.getCamera().getPos()
 				.squaredDistanceTo(entity.getPos());
 		NbtCompound nbt = entity.writeNbt(new NbtCompound());
+
+		List<Text> nameTagText = new ArrayList<>();
 		EntitySeparator.RULES.values().forEach(rule -> {
 			if (rule.isEnabled() && rule.containsEntityType(entity.getType())) {
-				if (rule.shouldRenderNameTag(nbt, d)) {
-					this.renderLabelIfPresent(entity, rule.getLabel(entity, nbt), matrices, vertexConsumers, light);
+				if (rule.shouldAddNameTag(nbt, d)) {
+					nameTagText.add(rule.getLabel(nbt));
 					ci.cancel();
 				}
 			}
 		});
+
+		if (!nameTagText.isEmpty()) {
+			if (this.hasLabel(entity))
+				nameTagText.add(0, entity.getCustomName());
+
+			matrices.push();
+			for (int i = nameTagText.size() - 1; i >= 0; i--) {
+				this.renderLabelIfPresent(entity, nameTagText.get(i), matrices, vertexConsumers, light);
+				matrices.translate(0F, 0.25F, 0F);
+			}
+			matrices.pop();
+		}
+
 		if (d > 4096.0) ci.cancel();
 	}
 }

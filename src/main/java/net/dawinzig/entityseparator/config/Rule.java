@@ -3,7 +3,6 @@ package net.dawinzig.entityseparator.config;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.argument.NbtPathArgumentType;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.*;
 import net.minecraft.text.Text;
@@ -21,8 +20,7 @@ public class Rule {
     private boolean compareMode = false;
     private final HashSet<NbtElement> compare = new HashSet<>();
     private int maxDistance = 32;
-    private String labelPatternWithoutName = "&6Entity matched!";
-    private String labelPatternWithName = "&6{name} matched!";
+    private String labelPattern = "&6Entity matched!";
     private String texture = "";
 
     public Rule() {
@@ -37,8 +35,7 @@ public class Rule {
         });
         this.setPath(nbtCompound.getString("path"));
         this.maxDistance = nbtCompound.getInt("distance");
-        this.labelPatternWithoutName = nbtCompound.getString("pattern");
-        this.labelPatternWithName = nbtCompound.getString("pattern_name");
+        this.labelPattern = nbtCompound.getString("pattern");
         if (nbtCompound.contains("compare")) {
             this.compare.addAll(((NbtList) Objects.requireNonNull(nbtCompound.get("compare"))));
             this.compareMode = true;
@@ -59,8 +56,7 @@ public class Rule {
         nbtCompound.put("entity_types", entityTypes);
         nbtCompound.putString("path", this.getPath());
         nbtCompound.putInt("distance", this.maxDistance);
-        nbtCompound.putString("pattern", this.labelPatternWithoutName);
-        nbtCompound.putString("pattern_name", this.labelPatternWithName);
+        nbtCompound.putString("pattern", this.labelPattern);
         if (this.isCompareMode()) {
             NbtList nbtList = new NbtList();
             nbtList.addAll(this.compare);
@@ -72,7 +68,7 @@ public class Rule {
         return nbtCompound;
     }
 
-    public boolean shouldRenderNameTag(NbtCompound nbt, double d) {
+    public boolean shouldAddNameTag(NbtCompound nbt, double d) {
         if (d <= this.maxDistance * this.maxDistance) {
             return this.matchNbt(nbt);
         }
@@ -93,8 +89,7 @@ public class Rule {
 
     public boolean isValid() {
         return !Objects.equals(name, "") && entityTypes.size() > 0 && path != null &&
-                (!compareMode || !compare.isEmpty()) && !Objects.equals(labelPatternWithName, "") &&
-                !Objects.equals(labelPatternWithoutName, "");
+                (!compareMode || !compare.isEmpty()) && !Objects.equals(labelPattern, "");
     }
 
     public boolean isEnabled() {
@@ -219,13 +214,8 @@ public class Rule {
         this.maxDistance = maxDistance;
     }
 
-    public Text getLabel(Entity entity, NbtCompound nbt) {
-        String labelText;
-
-        if (entity.hasCustomName())
-            labelText = this.labelPatternWithName.replace("{name}", Objects.requireNonNull(entity.getCustomName()).getString());
-        else labelText = this.labelPatternWithoutName;
-
+    public Text getLabel(NbtCompound nbt) {
+        String labelText = this.labelPattern;
         Matcher placeholder = Pattern.compile("\\{([^{]*)}").matcher(labelText);
         while (placeholder.find()) {
             String replacement = "&c[Error]&r";
@@ -234,20 +224,13 @@ public class Rule {
             } catch (CommandSyntaxException|StringIndexOutOfBoundsException ignored) {}
             labelText = labelText.replaceAll("\\{" + placeholder.group(1) + "}", replacement);
         }
-
         return Text.literal(labelText.replace('&', '§'));
     }
     public String getLabelPattern() {
-        return labelPatternWithoutName;
+        return labelPattern;
     }
     public void setLabelPattern(String pattern) {
-        this.labelPatternWithoutName = pattern;
-    }
-    public String getLabelPatternWithName() {
-        return labelPatternWithName;
-    }
-    public void setLabelPatternWithName(String pattern) {
-        this.labelPatternWithName = pattern;
+        this.labelPattern = pattern;
     }
 
     public boolean hasTexture() {
