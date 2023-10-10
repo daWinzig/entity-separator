@@ -1,102 +1,101 @@
 package net.dawinzig.entityseparator.gui.screens;
 
+import net.dawinzig.entityseparator.config.Config;
+import net.dawinzig.entityseparator.config.Option;
 import net.dawinzig.entityseparator.gui.toasts.MessageToast;
 import net.dawinzig.entityseparator.gui.widgets.ListWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 public class SettingsScreen extends Screen {
     private static final Text TITLE = Text.translatable("entityseparator.settings.title");
-    private static final Text RELOAD_LABEL = Text.translatable("entityseparator.button.reload");
-    private static final Identifier RELOAD_ID_SHORT = new Identifier("entityseparator", "reload");
     private final Screen parent;
-    private final TextIconButtonWidget reloadButton;
     private final ListWidget optionsList;
 
     protected SettingsScreen(Screen parent) {
         super(TITLE);
         this.parent = parent;
 
-        reloadButton = TextIconButtonWidget.builder(
-                        RELOAD_LABEL, (button) -> {
-
-                            this.reset();
-                            assert this.client != null;
-                            this.client.getToastManager().add(new MessageToast(
-                                    this.client,
-                                    Text.translatable("entityseparator.toast.reload", TITLE),
-                                    MessageToast.Level.INFO
-                            ));}, true)
-                .texture(RELOAD_ID_SHORT, 16, 16)
-                .dimension(20, 20).build();
-        reloadButton.setTooltip(Tooltip.of(RELOAD_LABEL));
-
         this.optionsList = new ListWidget(this, MinecraftClient.getInstance());
-        this.reset();
+        this.getOptions();
     }
 
-    private void reset() {
-        int r = new Random().nextInt(20);
-        assert MinecraftClient.getInstance().player != null;
-        int g = new Random((int) MinecraftClient.getInstance().mouse.getX()).nextInt(20);
-        optionsList.clear();
-        optionsList.addHeader(Text.of("Mirror, mirror on the wall..."), Text.of("How do this look?"));
-        optionsList.addEntry(
-                Text.of("I do nothing!"), Text.of("or do I..?"),
-                r, r, 0, 20,
-                ListWidget.FunctionEnable.ON_CHANGED,
-                new Identifier("entityseparator", "reset"),
-                Text.translatable("entityseparator.button.reset"),
-                Text.translatable("entityseparator.button.reset.narrator"),
-                entry -> {
-                    entry.focusOn(entry.children().get(0));
-                    entry.reset();
-                },
-                entry -> { if (r == g) entry.setValid(false); },
-                entry -> {}
-        );
-        boolean x = new Random().nextBoolean();
-        optionsList.addEntry(
-                Text.of("Hellooo!"), null, x, !x,
-                ListWidget.FunctionEnable.ON_CHANGED,
-                new Identifier("entityseparator", "reset"),
-                Text.translatable("entityseparator.button.reset"),
-                Text.translatable("entityseparator.button.reset.narrator"),
-                entry -> {
-                    entry.focusOn(entry.children().get(0));
-                    entry.reset();
-                }, entry -> {}, entry -> {}
-        );
-        optionsList.addEntry(
-                Text.of("Do you want to say something?!"), Text.of("pleeeesssseeee..."),
-                "", "...",
-                ListWidget.FunctionEnable.ON_CHANGED,
-                new Identifier("entityseparator", "reset"),
-                Text.translatable("entityseparator.button.reset"),
-                Text.translatable("entityseparator.button.reset.narrator"),
-                entry -> {
-                    entry.focusOn(entry.children().get(0));
-                    entry.reset();
-                }, entry -> {}, entry -> {}
-        );
+    private void getOptions() {
+        this.getOptions(Config.OPTIONS, new ArrayList<>());
+    }
+    private void getOptions(Option.Category category, List<String> path) {
+        category.foreach((key, option) -> {
+            if (option.isShownInGUI()) {
+                List<String> newPath = new ArrayList<>(path);
+                newPath.add(key);
+                this.addOption(option, newPath.toArray(new String[0]));
+                if (option instanceof Option.Category) this.getOptions((Option.Category) option, newPath);
+            }
+        });
+    }
+    private void addOption(Option<?> option, String[] path) {
+        if (option instanceof Option.Category) {
+            this.optionsList.addHeader(Text.of(option.getDisplayName()), Text.of(option.getTooltip()));
+        } else if (option instanceof Option.Bool) {
+            this.optionsList.addEntry(
+                    Text.of(option.getDisplayName()), Text.of(option.getTooltip()),
+                    ((Option.Bool) option).getValue(), ((Option.Bool) option).getDefaultValue(),
+                    ListWidget.FunctionEnable.ON_CHANGED,
+                    new Identifier("entityseparator", "reset"),
+                    Text.translatable("entityseparator.button.reset"),
+                    Text.translatable("entityseparator.button.reset.narrator"),
+                    entry -> {
+                        entry.focusOn(entry.children().get(0));
+                        entry.reset();
+                    },
+                    entry -> Config.OPTIONS.getBool(path).setValue(entry.getValue()),
+                    entry -> {}
+            );
+        } else if (option instanceof Option.Str) {
+            this.optionsList.addEntry(
+                    Text.of(option.getDisplayName()), Text.of(option.getTooltip()),
+                    ((Option.Str) option).getValue(), ((Option.Str) option).getDefaultValue(),
+                    ListWidget.FunctionEnable.ON_CHANGED,
+                    new Identifier("entityseparator", "reset"),
+                    Text.translatable("entityseparator.button.reset"),
+                    Text.translatable("entityseparator.button.reset.narrator"),
+                    entry -> {
+                        entry.focusOn(entry.children().get(0));
+                        entry.reset();
+                    },
+                    entry -> Config.OPTIONS.getStr(path).setValue(entry.getValue()),
+                    entry -> {}
+            );
+        } else if (option instanceof Option.Int) {
+            this.optionsList.addEntry(
+                    Text.of(option.getDisplayName()), Text.of(option.getTooltip()),
+                    ((Option.Int) option).getValue(), ((Option.Int) option).getDefaultValue(),
+                    ((Option.Int) option).getMin(), ((Option.Int) option).getMax(),
+                    ListWidget.FunctionEnable.ON_CHANGED,
+                    new Identifier("entityseparator", "reset"),
+                    Text.translatable("entityseparator.button.reset"),
+                    Text.translatable("entityseparator.button.reset.narrator"),
+                    entry -> {
+                        entry.focusOn(entry.children().get(0));
+                        entry.reset();
+                    },
+                    entry -> Config.OPTIONS.getInt(path).setValue(entry.getValue()),
+                    entry -> {}
+            );
+        }
     }
 
     @Override
     protected void init() {
-        reloadButton.setX(3);
-        reloadButton.setY(9);
-        this.addDrawableChild(reloadButton);
-
         optionsList.update();
         this.addSelectableChild(this.optionsList);
 
@@ -104,10 +103,8 @@ public class SettingsScreen extends Screen {
             Objects.requireNonNull(this.client).setScreen(this.parent)
         ).dimensions(this.width / 2 - 155, this.height - 29, 150, 20).build());
 
-        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> {
-            this.optionsList.save();
-            Objects.requireNonNull(this.client).setScreen(this.parent);
-        }).dimensions(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
+        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> this.save()
+        ).dimensions(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
     }
 
     @Override
@@ -128,11 +125,22 @@ public class SettingsScreen extends Screen {
             Objects.requireNonNull(client).setScreen(new ConfirmScreen(this,
                     Text.translatable("entityseparator.confirmsave.title"),
                     choice -> {
-                        if (choice == ConfirmScreen.Choice.YES)
-                            this.optionsList.save();
-                        Objects.requireNonNull(this.client).setScreen(this.parent);
+                        if (choice == ConfirmScreen.Choice.YES) this.save();
+                        else Objects.requireNonNull(this.client).setScreen(this.parent);
                     }));
         else
             Objects.requireNonNull(this.client).setScreen(this.parent);
+    }
+
+    public void save() {
+        this.optionsList.save();
+        if (!Config.IO.saveConfig())
+            Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
+                    this.client,
+                    Text.translatable("entityseparator.toast.save.failed", "config"),
+                    MessageToast.Level.ERROR
+            ));
+
+        Objects.requireNonNull(this.client).setScreen(this.parent);
     }
 }

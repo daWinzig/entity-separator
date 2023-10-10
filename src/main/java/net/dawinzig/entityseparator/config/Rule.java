@@ -8,12 +8,14 @@ import net.minecraft.nbt.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Rule {
-    private boolean enabled = false;
     private String name = "New Rule";
     private final HashSet<EntityType<?>> entityTypes = new HashSet<>();
     private NbtPathArgumentType.NbtPath path = null;
@@ -88,15 +90,8 @@ public class Rule {
     }
 
     public boolean isValid() {
-        return !Objects.equals(name, "") && entityTypes.size() > 0 && path != null &&
+        return !Objects.equals(name, "") && !entityTypes.isEmpty() && path != null &&
                 (!compareMode || !compare.isEmpty()) && !Objects.equals(labelPattern, "");
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     public String getName() {
@@ -145,13 +140,10 @@ public class Rule {
     public String getPath() {
         return this.path.toString();
     }
-    public boolean setPath(String path) {
+    public void setPath(String path) {
         try {
             this.path = new NbtPathArgumentType().parse(new StringReader(path));
-        } catch (CommandSyntaxException|StringIndexOutOfBoundsException ignored) {
-            return false;
-        }
-        return true;
+        } catch (CommandSyntaxException|StringIndexOutOfBoundsException ignored) {}
     }
     public static boolean isValidPath(String path) {
         try {
@@ -216,6 +208,7 @@ public class Rule {
 
     public Text getLabel(NbtCompound nbt) {
         String labelText = this.labelPattern;
+
         Matcher placeholder = Pattern.compile("\\{([^{]*)}").matcher(labelText);
         while (placeholder.find()) {
             String replacement = "&c[Error]&r";
@@ -224,6 +217,7 @@ public class Rule {
             } catch (CommandSyntaxException|StringIndexOutOfBoundsException ignored) {}
             labelText = labelText.replaceAll("\\{" + placeholder.group(1) + "}", replacement);
         }
+
         return Text.literal(labelText.replace('&', '§'));
     }
     public String getLabelPattern() {
@@ -241,5 +235,34 @@ public class Rule {
     }
     public void setTexture(String texture) {
         this.texture = texture;
+    }
+
+    public Rule copy() {
+        Rule rule = new Rule();
+        rule.name = this.name;
+        rule.entityTypes.clear();
+        rule.entityTypes.addAll(this.entityTypes);
+        rule.path = this.path;
+        rule.compareMode = this.compareMode;
+        rule.setCompare(this.getCompare());
+        rule.maxDistance = this.maxDistance;
+        rule.labelPattern = this.labelPattern;
+        rule.texture = this.texture;
+        return rule;
+    }
+
+    public boolean compare(Object other) {
+        if (this == other) return true;
+        if (other == null) return false;
+        if (!(other instanceof Rule)) return false;
+
+        if (!Objects.equals(this.name, ((Rule) other).name)) return false;
+        if (!Objects.equals(this.entityTypes, ((Rule) other).entityTypes)) return false;
+        if (!Objects.equals(this.getPath(), ((Rule) other).getPath())) return false;
+        if (!Objects.equals(this.compareMode, ((Rule) other).compareMode)) return false;
+        if (!Objects.equals(this.compare, ((Rule) other).compare)) return false;
+        if (!Objects.equals(this.maxDistance, ((Rule) other).maxDistance)) return false;
+        if (!Objects.equals(this.labelPattern, ((Rule) other).labelPattern)) return false;
+        return Objects.equals(this.texture, ((Rule) other).texture);
     }
 }

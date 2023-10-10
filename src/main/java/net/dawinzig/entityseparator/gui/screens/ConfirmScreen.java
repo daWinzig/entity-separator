@@ -10,7 +10,7 @@ import net.minecraft.client.gui.widget.ThreePartsLayoutWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 
-import java.util.*;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 @Environment(EnvType.CLIENT)

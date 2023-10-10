@@ -1,12 +1,12 @@
 package net.dawinzig.entityseparator.mixin;
 
-import net.dawinzig.entityseparator.EntitySeparator;
+import net.dawinzig.entityseparator.config.Config;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -35,13 +35,13 @@ public abstract class NameTagMixin<T extends Entity> {
 				.squaredDistanceTo(entity.getPos());
 		NbtCompound nbt = entity.writeNbt(new NbtCompound());
 
-		List<Text> nameTagText = new ArrayList<>();
-		EntitySeparator.RULES.values().forEach(rule -> {
-			if (rule.isEnabled() && rule.containsEntityType(entity.getType())) {
-				if (rule.shouldAddNameTag(nbt, d)) {
-					nameTagText.add(rule.getLabel(nbt));
-					ci.cancel();
-				}
+        List<Text> nameTagText = new ArrayList<>();
+		Config.RULES.forEach((path, rule) -> {
+			if (Config.isRuleEnabled(path) && rule.containsEntityType(entity.getType())) {
+                if (rule.shouldAddNameTag(nbt, d)) {
+                    nameTagText.add(rule.getLabel(nbt));
+                    ci.cancel();
+                }
 			}
 		});
 

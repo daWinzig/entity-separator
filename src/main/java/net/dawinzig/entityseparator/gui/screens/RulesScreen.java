@@ -1,6 +1,7 @@
 package net.dawinzig.entityseparator.gui.screens;
 
-import net.dawinzig.entityseparator.EntitySeparator;
+import net.dawinzig.entityseparator.config.Config;
+import net.dawinzig.entityseparator.config.Rule;
 import net.dawinzig.entityseparator.gui.toasts.MessageToast;
 import net.dawinzig.entityseparator.gui.widgets.ListWidget;
 import net.minecraft.client.MinecraftClient;
@@ -13,7 +14,8 @@ import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import java.util.Objects;
+import java.nio.file.Path;
+import java.util.*;
 
 public class RulesScreen extends Screen {
     private static final Text TITLE = Text.translatable("entityseparator.list.title");
@@ -28,11 +30,13 @@ public class RulesScreen extends Screen {
 
     private final Screen parent;
     private final ListWidget rulesList;
+    private final Set<Path> pendingDelete;
+    private final Map<Rule, Boolean> pendingCreation;
+    private final Map<Path, Rule> pendingUpdate;
     private final ButtonWidget reloadButton;
     private final ButtonWidget openButton;
     private final ButtonWidget addButton;
     private final ButtonWidget optionsButton;
-    private boolean resetNextInit = false;
 
     public RulesScreen(Screen parent) {
         super(TITLE);
@@ -40,13 +44,16 @@ public class RulesScreen extends Screen {
         this.client = MinecraftClient.getInstance();
 
         this.rulesList = new ListWidget(this, this.client);
-        this.reset();
+        this.pendingDelete = new TreeSet<>();
+        this.pendingCreation = new LinkedHashMap<>();
+        this.pendingUpdate = new HashMap<>();
+        this.reload();
 
         reloadButton = TextIconButtonWidget.builder(
                         RELOAD_LABEL, (button) -> {
-                            EntitySeparator.RULES.clear();
-                            EntitySeparator.CONFIG.loadAllRules();
-                            this.reset();
+                            Config.RULES.clear();
+                            Config.IO.loadAllRules();
+                            this.reload();
                             assert this.client != null;
                             this.client.getToastManager().add(new MessageToast(
                                     this.client,
@@ -58,17 +65,14 @@ public class RulesScreen extends Screen {
                 .dimension(20, 20).build();
         reloadButton.setTooltip(Tooltip.of(RELOAD_LABEL));
 
-        openButton = TextIconButtonWidget.builder(OPEN_LABEL, (button) -> EntitySeparator.CONFIG.openRulesFolder(),true)
+        openButton = TextIconButtonWidget.builder(OPEN_LABEL, (button) -> Config.IO.openRulesFolder(),true)
                 .texture(OPEN_ID_SHORT, 16, 16)
                 .dimension(20, 20).build();
         openButton.setTooltip(Tooltip.of(OPEN_LABEL));
 
         addButton = TextIconButtonWidget.builder(
                         ADD_LABEL,
-                        (button) -> {
-                            Objects.requireNonNull(client).setScreen(new EditScreen(this));
-                            this.resetNextInit = true;
-                        },
+                        (button) -> Objects.requireNonNull(client).setScreen(new EditScreen(this)),
                         true)
                 .texture(ADD_ID_SHORT, 16, 16)
                 .dimension(20, 20).build();
@@ -83,32 +87,90 @@ public class RulesScreen extends Screen {
         optionsButton.setTooltip(Tooltip.of(SETTINGS_LABEL));
     }
 
-    private void reset() {
-        rulesList.clear();
-        EntitySeparator.RULES.forEach((path, rule) ->
-            rulesList.addEntry(
-                Text.of(rule.getName()), Text.of(path.toString()),
-                rule.isEnabled(), false,
-                ListWidget.FunctionEnable.ENABLED,
-                new Identifier("entityseparator", "edit"),
-                Text.translatable("entityseparator.button.editordelete"),
-                Text.translatable("entityseparator.button.editordelete.narrator"),
-                entry -> {
-                    Objects.requireNonNull(this.client).setScreen(new EditScreen(this, path, rule));
-                    this.resetNextInit = true;
-                },
-                entry -> {},
-                entry -> rule.setEnabled(entry.getValue())
+    protected void reload() {
+        this.rulesList.clear();
+        this.rulesList.addHeader(Text.translatable("entityseparator.ondisk"), Text.translatable("entityseparator.ondisk.tooltip"));
+        Config.RULES.forEach((path, rule) -> {
+            for (Config.DefaultRules defaultRule : Config.DefaultRules.values()) {
+                if (defaultRule.relPath.equals(path) &&
+                        Config.OPTIONS.getDefaultOrValue(false, "hideDefault", Config.pathToString(defaultRule.relPath))) return;
+            }
+            if (this.pendingDelete.contains(path)) return;
+            Rule usedRule;
+            String name;
+            if (this.pendingUpdate.containsKey(path)) {
+                usedRule = this.pendingUpdate.get(path);
+                name = "*" + usedRule.getName();
+            } else if (Config.SAVE_FAILED.contains(path)) {
+                usedRule = rule.copy();
+                name = "[!] " + usedRule.getName();
+            } else {
+                usedRule = rule.copy();
+                name = usedRule.getName();
+            }
+            this.rulesList.addEntry(
+                    Text.of(name), Text.of(path.toString()),
+                    Config.isRuleEnabled(path), false,
+                    ListWidget.FunctionEnable.ENABLED,
+                    new Identifier("entityseparator", "edit"),
+                    Text.translatable("entityseparator.button.editordelete"),
+                    Text.translatable("entityseparator.button.editordelete.narrator"),
+                    entry -> Objects.requireNonNull(this.client).setScreen(new EditScreen(this, usedRule, rule, path)),
+                    entry -> {},
+                    entry -> Config.setRuleEnabled(path, entry.getValue())
+            );
+        });
+        this.rulesList.addHeader(Text.translatable("entityseparator.created"), Text.translatable("entityseparator.created.tooltip"));
+        this.pendingCreation.keySet().forEach(rule ->
+            this.rulesList.addEntry(
+                    Text.of(rule.getName()), Text.of(""),
+                    this.pendingCreation.get(rule), false,
+                    ListWidget.FunctionEnable.ENABLED,
+                    new Identifier("entityseparator", "edit"),
+                    Text.translatable("entityseparator.button.editordelete"),
+                    Text.translatable("entityseparator.button.editordelete.narrator"),
+                    entry -> Objects.requireNonNull(this.client).setScreen(new EditScreen(this, rule)),
+                    entry -> {},
+                    entry -> this.pendingCreation.put(rule, entry.getValue())
             )
         );
+        this.rulesList.addHeader(Text.translatable("entityseparator.deleted"), Text.translatable("entityseparator.deleted.tooltip"));
+        this.pendingDelete.forEach(path -> {
+            if (!Config.RULES.containsKey(path)) return;
+            Rule rule = Config.RULES.get(path);
+            this.rulesList.addEntry(
+                    Text.of(rule.getName()), Text.of(path.toString()),
+                    ListWidget.FunctionEnable.ENABLED,
+                    new Identifier("entityseparator", "reset"),
+                    Text.translatable("entityseparator.button.restore"),
+                    Text.translatable("entityseparator.button.restore.narrator"),
+                    entry -> {
+                        this.pendingDelete.remove(path);
+                        this.reload();
+                    }
+            );
+        });
+    }
+
+    public void setPendingCreation(Rule rule) {
+        this.pendingCreation.put(rule, false);
+    }
+    public void removePendingCreation(Rule rule) {
+        this.pendingCreation.remove(rule);
+    }
+    public void setPendingDelete(Path path) {
+        this.pendingDelete.add(path);
+    }
+    public void setPendingUpdate(Path path, Rule rule) {
+        this.pendingUpdate.put(path, rule);
+    }
+    public void removePendingUpdate(Path path) {
+        this.pendingUpdate.remove(path);
     }
 
     @Override
     protected void init() {
-        if (resetNextInit) {
-            reset();
-            resetNextInit = false;
-        }
+        reload();
 
         reloadButton.setX(3);
         reloadButton.setY(9);
@@ -129,8 +191,12 @@ public class RulesScreen extends Screen {
         rulesList.update();
         this.addSelectableChild(this.rulesList);
 
-        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> this.close())
-                .dimensions(this.width / 2 - 75, this.height - 29, 150, 20).build());
+        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, (button) ->
+                Objects.requireNonNull(this.client).setScreen(this.parent)
+        ).dimensions(this.width / 2 - 155, this.height - 29, 150, 20).build());
+
+        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> this.save()
+        ).dimensions(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
     }
 
     @Override
@@ -147,6 +213,79 @@ public class RulesScreen extends Screen {
 
     @Override
     public void close() {
-        Objects.requireNonNull(this.client).setScreen(this.parent);
+        if (this.rulesList.hasChanged() || !this.pendingDelete.isEmpty() || !this.pendingCreation.isEmpty() ||
+                !this.pendingUpdate.isEmpty() || !Config.SAVE_FAILED.isEmpty())
+            Objects.requireNonNull(client).setScreen(new ConfirmScreen(this,
+                    Text.translatable("entityseparator.confirmsave.title"),
+                    choice -> {
+                        if (choice == ConfirmScreen.Choice.YES) this.save();
+                        else Objects.requireNonNull(this.client).setScreen(this.parent);
+                    }));
+        else
+            Objects.requireNonNull(this.client).setScreen(this.parent);}
+
+    private void save() {
+        boolean success = true;
+        boolean saveConfig = this.rulesList.hasChanged() || !this.pendingDelete.isEmpty() || !this.pendingCreation.isEmpty();
+
+        this.rulesList.save();
+
+        for (Path path : Config.SAVE_FAILED) {
+            if (this.pendingUpdate.containsKey(path) || this.pendingDelete.contains(path)) continue;
+            Config.RULES.put(path, Config.RULES.get(path));
+            if (!Config.IO.saveRule(path, Config.RULES.get(path))) {
+                success = false;
+                Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
+                        this.client,
+                        Text.translatable("entityseparator.toast.save.failed", path),
+                        MessageToast.Level.ERROR
+                ));
+            }
+        }
+
+        for (Map.Entry<Path, Rule> entry : this.pendingUpdate.entrySet()) {
+            Path path = entry.getKey();
+            Rule rule = entry.getValue();
+            if (!this.pendingDelete.contains(path)) {
+                Config.RULES.put(path, rule);
+                if (!Config.IO.saveRule(path, rule)) {
+                    success = false;
+                    Config.SAVE_FAILED.add(path);
+                    Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
+                            this.client,
+                            Text.translatable("entityseparator.toast.save.failed", path),
+                            MessageToast.Level.ERROR
+                    ));
+                }
+            }
+        }
+
+        this.pendingDelete.forEach(Config.IO::deleteRule);
+
+        for (Map.Entry<Rule, Boolean> entry : this.pendingCreation.entrySet()) {
+            Rule rule = entry.getKey();
+            Path path = Config.IO.getAvailiableRelRulePath(Path.of(""), rule.getName());
+            Config.RULES.put(path, rule);
+            Config.setRuleEnabled(path, entry.getValue());
+            if (!Config.IO.saveRule(path, rule)) {
+                success = false;
+                Config.SAVE_FAILED.add(path);
+                Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
+                        this.client,
+                        Text.translatable("entityseparator.toast.save.failed", path),
+                        MessageToast.Level.ERROR
+                ));
+            }
+        }
+
+        if (saveConfig) Config.IO.saveConfig();
+
+        if (success) Objects.requireNonNull(this.client).setScreen(this.parent);
+        else {
+            this.pendingUpdate.clear();
+            this.pendingDelete.clear();
+            this.pendingCreation.clear();
+            this.reload();
+        }
     }
 }

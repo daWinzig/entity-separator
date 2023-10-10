@@ -53,6 +53,12 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
                 functionIcon, functionTooltip, functionNarration, functionConsumer, saveConsumer, changeConsumer));
     }
 
+    public void addEntry(Text entryName, Text tooltipText, FunctionEnable functionEnable, Identifier identifier,
+                         Text functionTooltip, Text functionNarration, Consumer<Entry<Boolean>> functionConsumer) {
+        super.addEntry(new PlainEntry(entryName, tooltipText, functionEnable, identifier, functionTooltip,
+                functionNarration, functionConsumer));
+    }
+
     public void addHeader(Text title, Text tooltipText) {
         super.addEntry(new CategoryEntry(title, tooltipText));
     }
@@ -267,6 +273,25 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             this.toggleNarration = Text.translatable("entityseparator.toggle.narrator", this.entryName, this.toggleButton.getMessage());
 
             super.update();
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
+    public class PlainEntry extends ListWidget.Entry<Boolean> {
+        PlainEntry(Text entryName, Text tooltipText, FunctionEnable functionEnable, Identifier functionIcon,
+                   Text functionTooltip, Text functionNarration, Consumer<Entry<Boolean>> functionConsumer) {
+            super(ListWidget.this, entryName, tooltipText, true, true, functionEnable, functionIcon,
+                    functionTooltip, functionNarration, functionConsumer, entry -> {}, entry -> {});
+
+            this.update();
+        }
+
+        public List<? extends Element> children() {
+            return ImmutableList.of(this.functionButton);
+        }
+
+        public List<? extends Selectable> selectableChildren() {
+            return ImmutableList.of(this.functionButton);
         }
     }
 

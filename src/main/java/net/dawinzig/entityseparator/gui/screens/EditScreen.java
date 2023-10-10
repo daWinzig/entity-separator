@@ -1,8 +1,6 @@
 package net.dawinzig.entityseparator.gui.screens;
 
-import net.dawinzig.entityseparator.EntitySeparator;
 import net.dawinzig.entityseparator.config.Rule;
-import net.dawinzig.entityseparator.gui.toasts.MessageToast;
 import net.dawinzig.entityseparator.gui.widgets.ListWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -22,56 +20,57 @@ public class EditScreen extends Screen {
     private static final Text TITLE_EDIT = Text.translatable("entityseparator.edit.title");
     private static final Text DELETE_LABEL = Text.translatable("entityseparator.button.delete");
     private static final Identifier DELETE_ID_SHORT = new Identifier("entityseparator", "delete");
-    private final Screen parent;
-    private final Path path;
+    private final RulesScreen parent;
     private final Rule rule;
+    private final Rule defaultRule;
+    private final Path path;
     private final ButtonWidget deleteButton;
     private final ListWidget listWidget;
     private final ButtonWidget doneButton;
     private final ButtonWidget cancelButton;
+    private final boolean isNew;
 
-    protected EditScreen(Screen parent) {
-        this(parent, null, new Rule());
+    protected EditScreen(RulesScreen parent) {
+        this(parent, null, null, null);
     }
-
-    protected EditScreen(Screen parent, Path path, Rule rule) {
-        super(path != null
-                ? TITLE_EDIT.copy().append(Text.of(" (%s)".formatted(path)))
-                : TITLE_NEW);
+    protected EditScreen(RulesScreen parent, Rule rule) {
+        this(parent, rule, null, null);
+    }
+    protected EditScreen(RulesScreen parent, Rule rule, Rule defaultRule) {
+        this(parent, rule, defaultRule, null);
+    }
+    protected EditScreen(RulesScreen parent, Rule rule, Rule defaultRule, Path path) {
+        super(path != null ? TITLE_EDIT.copy().append(" (%s)".formatted(path.toString())) : TITLE_NEW);
         this.parent = parent;
-        this.path = path;
-        this.rule = rule;
         this.client = MinecraftClient.getInstance();
+        if (rule == null) {
+            this.rule = new Rule();
+            this.isNew = true;
+        } else {
+            this.rule = rule;
+            this.isNew = false;
+        }
+        if (defaultRule == null) {
+            this.defaultRule = this.rule.copy();
+        } else {
+            this.defaultRule = defaultRule;
+        }
+        this.path = path;
 
-        if (path != null) {
-            deleteButton = TextIconButtonWidget.builder(
-                            DELETE_LABEL,
-                            button -> Objects.requireNonNull(client).setScreen(new ConfirmScreen(this,
-                                    Text.translatable("entityseparator.confirm.delete.title"),
-                                    choice -> {
-                                        if (choice == ConfirmScreen.Choice.YES) {
-                                            if (EntitySeparator.CONFIG.deleteRule(this.path)) {
-                                                this.client.getToastManager().add(new MessageToast(
-                                                        this.client,
-                                                        Text.translatable("entityseparator.toast.delete.success"),
-                                                        MessageToast.Level.SUCCESS
-                                                ));
-                                                Objects.requireNonNull(this.client).setScreen(this.parent);
-                                            } else {
-                                                this.client.getToastManager().add(new MessageToast(
-                                                        this.client,
-                                                        Text.translatable("entityseparator.toast.delete.failed"),
-                                                        MessageToast.Level.ERROR
-                                                ));
-                                                Objects.requireNonNull(this.client).setScreen(this);
-                                            }
-                                        }
-                                    })),
-                            true)
+        if (!this.isNew) {
+            this.deleteButton = TextIconButtonWidget.builder(
+                    DELETE_LABEL, button -> {
+                            if (this.path != null) {
+                                parent.setPendingDelete(this.path);
+                            } else {
+                                parent.removePendingCreation(rule);
+                            }
+                            Objects.requireNonNull(this.client).setScreen(this.parent);
+                        }, true)
                     .texture(DELETE_ID_SHORT, 16, 16)
                     .dimension(20, 20).build();
             deleteButton.setTooltip(Tooltip.of(DELETE_LABEL));
-        } else deleteButton = null;
+        } else this.deleteButton = null;
 
         this.listWidget = new ListWidget(this, this.client);
 
@@ -79,12 +78,12 @@ public class EditScreen extends Screen {
                 Objects.requireNonNull(this.client).setScreen(this.parent)
         ).dimensions(this.width / 2 - 155, this.height - 29, 150, 20).build();
 
-        this.doneButton = ButtonWidget.builder(ScreenTexts.DONE, (button) -> this.exit())
+        this.doneButton = ButtonWidget.builder(ScreenTexts.DONE, (button) -> this.save())
                 .dimensions(this.width / 2 + 5, this.height - 29, 150, 20).build();
 
         listWidget.addEntry(
                 Text.translatable("entityseparator.rule.name"), null,
-                rule.getName(), rule.getName(),
+                this.rule.getName(), this.defaultRule.getName(),
                 ListWidget.FunctionEnable.ON_CHANGED,
                 new Identifier("entityseparator", "reset"),
                 Text.translatable("entityseparator.button.reset"),
@@ -96,10 +95,9 @@ public class EditScreen extends Screen {
                     this.updateDoneEnabled();
                 }
         );
-        String entityTypes = rule.getEntityTypes();
         listWidget.addEntry(
                 Text.translatable("entityseparator.rule.entities"), null,
-                entityTypes, entityTypes,
+                this.rule.getEntityTypes(), this.defaultRule.getEntityTypes(),
                 ListWidget.FunctionEnable.ON_CHANGED,
                 new Identifier("entityseparator", "reset"),
                 Text.translatable("entityseparator.button.reset"),
@@ -113,7 +111,7 @@ public class EditScreen extends Screen {
         );
         listWidget.addEntry(
                 Text.translatable("entityseparator.rule.path"), null,
-                rule.getPath(), rule.getPath(),
+                this.rule.getPath(), this.defaultRule.getPath(),
                 ListWidget.FunctionEnable.ON_CHANGED,
                 new Identifier("entityseparator", "reset"),
                 Text.translatable("entityseparator.button.reset"),
@@ -128,7 +126,7 @@ public class EditScreen extends Screen {
         listWidget.addEntry(
                 Text.translatable("entityseparator.rule.compare"),
                 Text.translatable("entityseparator.rule.compare.tooltip"),
-                rule.getCompare(), rule.getCompare(),
+                this.rule.getCompare(), this.defaultRule.getCompare(),
                 ListWidget.FunctionEnable.ON_CHANGED,
                 new Identifier("entityseparator", "reset"),
                 Text.translatable("entityseparator.button.reset"),
@@ -142,7 +140,7 @@ public class EditScreen extends Screen {
         );
         listWidget.addEntry(
                 Text.translatable("entityseparator.rule.pattern"), null,
-                rule.getLabelPattern(), rule.getLabelPattern(),
+                this.rule.getLabelPattern(), this.defaultRule.getLabelPattern(),
                 ListWidget.FunctionEnable.ON_CHANGED,
                 new Identifier("entityseparator", "reset"),
                 Text.translatable("entityseparator.button.reset"),
@@ -156,7 +154,7 @@ public class EditScreen extends Screen {
         );
         listWidget.addEntry(
                 Text.translatable("entityseparator.rule.distance"), null,
-                rule.getMaxDistance(), rule.getMaxDistance(), 1, 128,
+                this.rule.getMaxDistance(), this.defaultRule.getMaxDistance(), 1, 128,
                 ListWidget.FunctionEnable.ON_CHANGED,
                 new Identifier("entityseparator", "reset"),
                 Text.translatable("entityseparator.button.reset"),
@@ -168,7 +166,7 @@ public class EditScreen extends Screen {
         listWidget.addEntry(
                 Text.translatable("entityseparator.rule.texture"),
                 Text.translatable("entityseparator.rule.texture.tooltip"),
-                rule.getTexture(), rule.getTexture(),
+                this.rule.getTexture(), this.defaultRule.getTexture(),
                 ListWidget.FunctionEnable.ON_CHANGED,
                 new Identifier("entityseparator", "reset"),
                 Text.translatable("entityseparator.button.reset"),
@@ -181,7 +179,7 @@ public class EditScreen extends Screen {
 
     @Override
     protected void init() {
-        if (path != null) {
+        if (deleteButton != null) {
             deleteButton.setX(this.width - 23);
             deleteButton.setY(9);
             this.addDrawableChild(deleteButton);
@@ -228,7 +226,7 @@ public class EditScreen extends Screen {
                     Text.translatable("entityseparator.confirmsave.title"),
                     choice -> {
                         if (choice == ConfirmScreen.Choice.YES) {
-                            this.exit();
+                            this.save();
                         }
                         else
                             Objects.requireNonNull(this.client).setScreen(this.parent);
@@ -237,14 +235,14 @@ public class EditScreen extends Screen {
             Objects.requireNonNull(this.client).setScreen(this.parent);
     }
 
-    private void exit() {
+    private void save() {
         this.listWidget.save();
-        Path path = this.path;
-        if (path == null) {
-            path = EntitySeparator.CONFIG.getAvailiableRelRulePath(Path.of(""), this.rule.getName());
-            EntitySeparator.RULES.put(path, this.rule);
+        if (this.path != null) {
+            if (this.rule.compare(this.defaultRule)) this.parent.removePendingUpdate(this.path);
+            else this.parent.setPendingUpdate(this.path, this.rule);
         }
-        if (EntitySeparator.CONFIG.saveRule(path, this.rule))
-            Objects.requireNonNull(this.client).setScreen(this.parent);
+        else if (this.isNew) this.parent.setPendingCreation(this.rule);
+        parent.reload();
+        Objects.requireNonNull(this.client).setScreen(this.parent);
     }
 }
