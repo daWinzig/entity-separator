@@ -91,10 +91,6 @@ public class RulesScreen extends Screen {
         this.rulesList.clear();
         this.rulesList.addHeader(Text.translatable("entityseparator.ondisk"), Text.translatable("entityseparator.ondisk.tooltip"));
         Config.RULES.forEach((path, rule) -> {
-            for (Config.DefaultRules defaultRule : Config.DefaultRules.values()) {
-                if (defaultRule.relPath.equals(path) &&
-                        Config.OPTIONS.getDefaultOrValue(false, "hideDefault", Config.pathToString(defaultRule.relPath))) return;
-            }
             if (this.pendingDelete.contains(path)) return;
             Rule usedRule;
             String name;

@@ -68,15 +68,15 @@ public abstract class Option<T> {
             return ((Category) children.get(key[0])).getOrCreateCategory(Arrays.copyOfRange(key, 1, key.length));
         }
 
-        public boolean getDefaultOrValue(boolean defaultValue, String... key) {
+        public boolean getValueOrDefault(boolean defaultValue, String... key) {
             Bool option = getBool(key);
             return option != null ? option.getValue() : defaultValue;
         }
-        public int getDefaultOrValue(int defaultValue, String... key) {
+        public int getValueOrDefault(int defaultValue, String... key) {
             Int option = getInt(key);
             return option != null ? option.getValue() : defaultValue;
         }
-        public String getDefaultOrValue(String defaultValue, String... key) {
+        public String getValueOrDefault(String defaultValue, String... key) {
             Str option = getStr(key);
             return option != null ? option.getValue() : defaultValue;
         }

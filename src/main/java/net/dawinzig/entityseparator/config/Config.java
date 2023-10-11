@@ -97,12 +97,10 @@ public class Config {
         this.saveConfig();
     }
     private static void generateDefaultConfig() {
-        Option.Category hideDefault = new Option.Category("Hide Default Rules", null);
-        Config.OPTIONS.addChild("hideDefault", hideDefault);
-        for (DefaultRules defaultRule : DefaultRules.values()) {
-            hideDefault.addChild(pathToString(defaultRule.relPath), new Option.Bool(
-                    defaultRule.rule.getName(), defaultRule.relPath.toString(), false, false));
-        }
+        Config.OPTIONS.addChild("regenerate", new Option.Bool(
+                "Regenerate Default Rules",
+                "Regenerate Default Rules on (re-)load if not already present",
+                true, true));
 
 //        Option.Category test_tt = new Option.Category("Hello World", "this is a test with tooltips");
 //        Config.OPTIONS.addChild("test_tt", test_tt);
@@ -197,7 +195,9 @@ public class Config {
     }
 
     public void loadAllRules() {
-        this.generateDefaultRulesIfMissing();
+        if (Config.OPTIONS.getValueOrDefault(false, "regenerate"))
+            this.generateDefaultRulesIfMissing();
+
         PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:**"+Config.ruleFileExtension);
         try (Stream<Path> paths = Files.walk(Path.of(getFolder(rulesPath).toURI()))) {
             paths.forEach(path -> {
