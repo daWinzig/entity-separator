@@ -1,5 +1,6 @@
 package net.dawinzig.entityseparator.gui.screens;
 
+import net.dawinzig.entityseparator.Resources;
 import net.dawinzig.entityseparator.config.Config;
 import net.dawinzig.entityseparator.config.Rule;
 import net.dawinzig.entityseparator.gui.toasts.MessageToast;
@@ -10,24 +11,12 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
-import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 import java.nio.file.Path;
 import java.util.*;
 
 public class RulesScreen extends Screen {
-    private static final Text TITLE = Text.translatable("entityseparator.list.title");
-    private static final Text RELOAD_LABEL = Text.translatable("entityseparator.button.reload");
-    private static final Text OPEN_LABEL = Text.translatable("entityseparator.button.open");
-    private static final Text ADD_LABEL = Text.translatable("entityseparator.list.button.add");
-    private static final Text SETTINGS_LABEL = Text.translatable("entityseparator.list.button.options");
-    private static final Identifier RELOAD_ID_SHORT = new Identifier("entityseparator", "reload");
-    private static final Identifier OPEN_ID_SHORT = new Identifier("entityseparator", "folder");
-    private static final Identifier ADD_ID_SHORT = new Identifier("entityseparator", "add");
-    private static final Identifier SETTINGS_ID_SHORT = new Identifier("entityseparator", "options");
-
     private final Screen parent;
     private final ListWidget rulesList;
     private final Set<Path> pendingDelete;
@@ -39,7 +28,7 @@ public class RulesScreen extends Screen {
     private final ButtonWidget optionsButton;
 
     public RulesScreen(Screen parent) {
-        super(TITLE);
+        super(Resources.Translation.TITLE_RULES);
         this.parent = parent;
         this.client = MinecraftClient.getInstance();
 
@@ -50,46 +39,46 @@ public class RulesScreen extends Screen {
         this.reload();
 
         reloadButton = TextIconButtonWidget.builder(
-                        RELOAD_LABEL, (button) -> {
+                        Resources.Translation.BUTTON_RELOAD, (button) -> {
                             Config.RULES.clear();
                             Config.IO.loadAllRules();
                             this.reload();
                             assert this.client != null;
                             this.client.getToastManager().add(new MessageToast(
                                     this.client,
-                                    Text.translatable("entityseparator.toast.reload", TITLE),
+                                    Resources.Translation.insert(Resources.Translation.TOAST_RELOAD, Resources.Translation.TITLE_RULES),
                                     MessageToast.Level.INFO
                             ));
                         }, true)
-                .texture(RELOAD_ID_SHORT, 16, 16)
+                .texture(Resources.IDShort.RELOAD, 16, 16)
                 .dimension(20, 20).build();
-        reloadButton.setTooltip(Tooltip.of(RELOAD_LABEL));
+        reloadButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_RELOAD));
 
-        openButton = TextIconButtonWidget.builder(OPEN_LABEL, (button) -> Config.IO.openRulesFolder(),true)
-                .texture(OPEN_ID_SHORT, 16, 16)
+        openButton = TextIconButtonWidget.builder(Resources.Translation.BUTTON_OPEN, (button) -> Config.IO.openRulesFolder(),true)
+                .texture(Resources.IDShort.FOLDER, 16, 16)
                 .dimension(20, 20).build();
-        openButton.setTooltip(Tooltip.of(OPEN_LABEL));
+        openButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_OPEN));
 
         addButton = TextIconButtonWidget.builder(
-                        ADD_LABEL,
+                        Resources.Translation.BUTTON_NEW,
                         (button) -> Objects.requireNonNull(client).setScreen(new EditScreen(this)),
                         true)
-                .texture(ADD_ID_SHORT, 16, 16)
+                .texture(Resources.IDShort.ADD, 16, 16)
                 .dimension(20, 20).build();
-        addButton.setTooltip(Tooltip.of(ADD_LABEL));
+        addButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_NEW));
 
         optionsButton = TextIconButtonWidget.builder(
-                        SETTINGS_LABEL,
+                        Resources.Translation.BUTTON_OPTIONS,
                         button -> Objects.requireNonNull(client).setScreen(new SettingsScreen(this)),
                         true)
-                .texture(SETTINGS_ID_SHORT, 16, 16)
+                .texture(Resources.IDShort.OPTIONS, 16, 16)
                 .dimension(20, 20).build();
-        optionsButton.setTooltip(Tooltip.of(SETTINGS_LABEL));
+        optionsButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_OPTIONS));
     }
 
     protected void reload() {
         this.rulesList.clear();
-        this.rulesList.addHeader(Text.translatable("entityseparator.ondisk"), Text.translatable("entityseparator.ondisk.tooltip"));
+        this.rulesList.addHeader(Resources.Translation.RULES_CATEGORY_ON_DISK, Resources.Translation.RULES_CATEGORY_ON_DISK_TOOLTIP);
         Config.RULES.forEach((path, rule) -> {
             if (this.pendingDelete.contains(path)) return;
             Rule usedRule;
@@ -108,38 +97,38 @@ public class RulesScreen extends Screen {
                     Text.of(name), Text.of(path.toString()),
                     Config.isRuleEnabled(path), false,
                     ListWidget.FunctionEnable.ENABLED,
-                    new Identifier("entityseparator", "edit"),
-                    Text.translatable("entityseparator.button.editordelete"),
-                    Text.translatable("entityseparator.button.editordelete.narrator"),
+                    Resources.IDShort.EDIT,
+                    Resources.Translation.BUTTON_EDIT_OR_DELETE,
+                    Resources.Translation.BUTTON_EDIT_OR_DELETE_NARRATOR,
                     entry -> Objects.requireNonNull(this.client).setScreen(new EditScreen(this, usedRule, rule, path)),
                     entry -> {},
                     entry -> Config.setRuleEnabled(path, entry.getValue())
             );
         });
-        this.rulesList.addHeader(Text.translatable("entityseparator.created"), Text.translatable("entityseparator.created.tooltip"));
+        this.rulesList.addHeader(Resources.Translation.RULES_CATEGORY_CREATED, Resources.Translation.RULES_CATEGORY_CREATED_TOOLTIP);
         this.pendingCreation.keySet().forEach(rule ->
             this.rulesList.addEntry(
                     Text.of(rule.getName()), Text.of(""),
                     this.pendingCreation.get(rule), false,
                     ListWidget.FunctionEnable.ENABLED,
-                    new Identifier("entityseparator", "edit"),
-                    Text.translatable("entityseparator.button.editordelete"),
-                    Text.translatable("entityseparator.button.editordelete.narrator"),
+                    Resources.IDShort.EDIT,
+                    Resources.Translation.BUTTON_EDIT_OR_DELETE,
+                    Resources.Translation.BUTTON_EDIT_OR_DELETE_NARRATOR,
                     entry -> Objects.requireNonNull(this.client).setScreen(new EditScreen(this, rule)),
                     entry -> {},
                     entry -> this.pendingCreation.put(rule, entry.getValue())
             )
         );
-        this.rulesList.addHeader(Text.translatable("entityseparator.deleted"), Text.translatable("entityseparator.deleted.tooltip"));
+        this.rulesList.addHeader(Resources.Translation.RULES_CATEGORY_DELETED, Resources.Translation.RULES_CATEGORY_DELETED_TOOLTIP);
         this.pendingDelete.forEach(path -> {
             if (!Config.RULES.containsKey(path)) return;
             Rule rule = Config.RULES.get(path);
             this.rulesList.addEntry(
                     Text.of(rule.getName()), Text.of(path.toString()),
                     ListWidget.FunctionEnable.ENABLED,
-                    new Identifier("entityseparator", "reset"),
-                    Text.translatable("entityseparator.button.restore"),
-                    Text.translatable("entityseparator.button.restore.narrator"),
+                    Resources.IDShort.RESET,
+                    Resources.Translation.BUTTON_RESTORE,
+                    Resources.Translation.BUTTON_RESTORE,
                     entry -> {
                         this.pendingDelete.remove(path);
                         this.reload();
@@ -187,11 +176,11 @@ public class RulesScreen extends Screen {
         rulesList.update();
         this.addSelectableChild(this.rulesList);
 
-        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, (button) ->
+        this.addDrawableChild(ButtonWidget.builder(Resources.Translation.BUTTON_CANCEL, (button) ->
                 Objects.requireNonNull(this.client).setScreen(this.parent)
         ).dimensions(this.width / 2 - 155, this.height - 29, 150, 20).build());
 
-        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> this.save()
+        this.addDrawableChild(ButtonWidget.builder(Resources.Translation.BUTTON_SAVE_EXIT, (button) -> this.save()
         ).dimensions(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
     }
 
@@ -212,7 +201,7 @@ public class RulesScreen extends Screen {
         if (this.rulesList.hasChanged() || !this.pendingDelete.isEmpty() || !this.pendingCreation.isEmpty() ||
                 !this.pendingUpdate.isEmpty() || !Config.SAVE_FAILED.isEmpty())
             Objects.requireNonNull(client).setScreen(new ConfirmScreen(this,
-                    Text.translatable("entityseparator.confirmsave.title"),
+                    Resources.Translation.CONFIRM_SAVE_TITLE,
                     choice -> {
                         if (choice == ConfirmScreen.Choice.YES) this.save();
                         else Objects.requireNonNull(this.client).setScreen(this.parent);
@@ -232,7 +221,7 @@ public class RulesScreen extends Screen {
                 success = false;
                 Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
                         this.client,
-                        Text.translatable("entityseparator.toast.save.failed", path),
+                        Resources.Translation.insert(Resources.Translation.TOAST_SAVE_FAILED, path),
                         MessageToast.Level.ERROR
                 ));
             }
@@ -248,7 +237,7 @@ public class RulesScreen extends Screen {
                     Config.SAVE_FAILED.add(path);
                     Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
                             this.client,
-                            Text.translatable("entityseparator.toast.save.failed", path),
+                            Resources.Translation.insert(Resources.Translation.TOAST_SAVE_FAILED, path),
                             MessageToast.Level.ERROR
                     ));
                 }
@@ -267,7 +256,7 @@ public class RulesScreen extends Screen {
                 Config.SAVE_FAILED.add(path);
                 Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
                         this.client,
-                        Text.translatable("entityseparator.toast.save.failed", path),
+                        Resources.Translation.insert(Resources.Translation.TOAST_SAVE_FAILED, path),
                         MessageToast.Level.ERROR
                 ));
             }

@@ -1,5 +1,6 @@
 package net.dawinzig.entityseparator.gui.screens;
 
+import net.dawinzig.entityseparator.Resources;
 import net.dawinzig.entityseparator.config.Rule;
 import net.dawinzig.entityseparator.gui.widgets.ListWidget;
 import net.minecraft.client.MinecraftClient;
@@ -8,18 +9,11 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 import java.nio.file.Path;
 import java.util.Objects;
 
 public class EditScreen extends Screen {
-    private static final Text TITLE_NEW = Text.translatable("entityseparator.add.title");
-    private static final Text TITLE_EDIT = Text.translatable("entityseparator.edit.title");
-    private static final Text DELETE_LABEL = Text.translatable("entityseparator.button.delete");
-    private static final Identifier DELETE_ID_SHORT = new Identifier("entityseparator", "delete");
     private final RulesScreen parent;
     private final Rule rule;
     private final Rule defaultRule;
@@ -40,7 +34,9 @@ public class EditScreen extends Screen {
         this(parent, rule, defaultRule, null);
     }
     protected EditScreen(RulesScreen parent, Rule rule, Rule defaultRule, Path path) {
-        super(path != null ? TITLE_EDIT.copy().append(" (%s)".formatted(path.toString())) : TITLE_NEW);
+        super(path != null
+                ? Resources.Translation.insert(Resources.Translation.TITLE_EDIT, path)
+                : Resources.Translation.TITLE_NEW);
         this.parent = parent;
         this.client = MinecraftClient.getInstance();
         if (rule == null) {
@@ -59,7 +55,7 @@ public class EditScreen extends Screen {
 
         if (!this.isNew) {
             this.deleteButton = TextIconButtonWidget.builder(
-                    DELETE_LABEL, button -> {
+                    Resources.Translation.BUTTON_DELETE, button -> {
                             if (this.path != null) {
                                 parent.setPendingDelete(this.path);
                             } else {
@@ -67,27 +63,27 @@ public class EditScreen extends Screen {
                             }
                             Objects.requireNonNull(this.client).setScreen(this.parent);
                         }, true)
-                    .texture(DELETE_ID_SHORT, 16, 16)
+                    .texture(Resources.IDShort.DELETE, 16, 16)
                     .dimension(20, 20).build();
-            deleteButton.setTooltip(Tooltip.of(DELETE_LABEL));
+            deleteButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_DELETE));
         } else this.deleteButton = null;
 
         this.listWidget = new ListWidget(this, this.client);
 
-        this.cancelButton = ButtonWidget.builder(ScreenTexts.CANCEL, (button) ->
+        this.cancelButton = ButtonWidget.builder(Resources.Translation.BUTTON_CANCEL, (button) ->
                 Objects.requireNonNull(this.client).setScreen(this.parent)
         ).dimensions(this.width / 2 - 155, this.height - 29, 150, 20).build();
 
-        this.doneButton = ButtonWidget.builder(ScreenTexts.DONE, (button) -> this.save())
+        this.doneButton = ButtonWidget.builder(Resources.Translation.BUTTON_DONE, (button) -> this.save())
                 .dimensions(this.width / 2 + 5, this.height - 29, 150, 20).build();
 
         listWidget.addEntry(
-                Text.translatable("entityseparator.rule.name"), null,
+                Resources.Translation.RULE_NAME, null,
                 this.rule.getName(), this.defaultRule.getName(),
                 ListWidget.FunctionEnable.ON_CHANGED,
-                new Identifier("entityseparator", "reset"),
-                Text.translatable("entityseparator.button.reset"),
-                Text.translatable("entityseparator.button.reset.narrator"),
+                Resources.IDShort.RESET,
+                Resources.Translation.BUTTON_RESET,
+                Resources.Translation.BUTTON_RESET,
                 ListWidget.Entry::reset,
                 entry -> this.rule.setName(entry.getValue()),
                 entry -> {
@@ -96,12 +92,12 @@ public class EditScreen extends Screen {
                 }
         );
         listWidget.addEntry(
-                Text.translatable("entityseparator.rule.entities"), null,
+                Resources.Translation.RULE_ENTITIES, null,
                 this.rule.getEntityTypes(), this.defaultRule.getEntityTypes(),
                 ListWidget.FunctionEnable.ON_CHANGED,
-                new Identifier("entityseparator", "reset"),
-                Text.translatable("entityseparator.button.reset"),
-                Text.translatable("entityseparator.button.reset.narrator"),
+                Resources.IDShort.RESET,
+                Resources.Translation.BUTTON_RESET,
+                Resources.Translation.BUTTON_RESET,
                 ListWidget.Entry::reset,
                 entry -> this.rule.setEntityTypes(entry.getValue()),
                 entry -> {
@@ -110,12 +106,12 @@ public class EditScreen extends Screen {
                 }
         );
         listWidget.addEntry(
-                Text.translatable("entityseparator.rule.path"), null,
+                Resources.Translation.RULE_PATH, null,
                 this.rule.getPath(), this.defaultRule.getPath(),
                 ListWidget.FunctionEnable.ON_CHANGED,
-                new Identifier("entityseparator", "reset"),
-                Text.translatable("entityseparator.button.reset"),
-                Text.translatable("entityseparator.button.reset.narrator"),
+                Resources.IDShort.RESET,
+                Resources.Translation.BUTTON_RESET,
+                Resources.Translation.BUTTON_RESET,
                 ListWidget.Entry::reset,
                 entry -> this.rule.setPath(entry.getValue()),
                 entry -> {
@@ -124,13 +120,13 @@ public class EditScreen extends Screen {
                 }
         );
         listWidget.addEntry(
-                Text.translatable("entityseparator.rule.compare"),
-                Text.translatable("entityseparator.rule.compare.tooltip"),
+                Resources.Translation.RULE_COMPARE,
+                Resources.Translation.RULE_COMPARE_TOOLTIP,
                 this.rule.getCompare(), this.defaultRule.getCompare(),
                 ListWidget.FunctionEnable.ON_CHANGED,
-                new Identifier("entityseparator", "reset"),
-                Text.translatable("entityseparator.button.reset"),
-                Text.translatable("entityseparator.button.reset.narrator"),
+                Resources.IDShort.RESET,
+                Resources.Translation.BUTTON_RESET,
+                Resources.Translation.BUTTON_RESET,
                 ListWidget.Entry::reset,
                 entry -> this.rule.setCompare(entry.getValue()),
                 entry -> {
@@ -139,12 +135,12 @@ public class EditScreen extends Screen {
                 }
         );
         listWidget.addEntry(
-                Text.translatable("entityseparator.rule.pattern"), null,
+                Resources.Translation.RULE_PATTERN, null,
                 this.rule.getLabelPattern(), this.defaultRule.getLabelPattern(),
                 ListWidget.FunctionEnable.ON_CHANGED,
-                new Identifier("entityseparator", "reset"),
-                Text.translatable("entityseparator.button.reset"),
-                Text.translatable("entityseparator.button.reset.narrator"),
+                Resources.IDShort.RESET,
+                Resources.Translation.BUTTON_RESET,
+                Resources.Translation.BUTTON_RESET,
                 ListWidget.Entry::reset,
                 entry -> this.rule.setLabelPattern(entry.getValue()),
                 entry -> {
@@ -153,24 +149,24 @@ public class EditScreen extends Screen {
                 }
         );
         listWidget.addEntry(
-                Text.translatable("entityseparator.rule.distance"), null,
+                Resources.Translation.RULE_DISTANCE, null,
                 this.rule.getMaxDistance(), this.defaultRule.getMaxDistance(), 1, 128,
                 ListWidget.FunctionEnable.ON_CHANGED,
-                new Identifier("entityseparator", "reset"),
-                Text.translatable("entityseparator.button.reset"),
-                Text.translatable("entityseparator.button.reset.narrator"),
+                Resources.IDShort.RESET,
+                Resources.Translation.BUTTON_RESET,
+                Resources.Translation.BUTTON_RESET,
                 ListWidget.Entry::reset,
                 entry -> this.rule.setMaxDistance(entry.getValue()),
                 entry -> this.updateDoneEnabled()
         );
         listWidget.addEntry(
-                Text.translatable("entityseparator.rule.texture"),
-                Text.translatable("entityseparator.rule.texture.tooltip"),
+                Resources.Translation.RULE_TEXTURE,
+                Resources.Translation.RULE_TEXTURE_TOOLTIP,
                 this.rule.getTexture(), this.defaultRule.getTexture(),
                 ListWidget.FunctionEnable.ON_CHANGED,
-                new Identifier("entityseparator", "reset"),
-                Text.translatable("entityseparator.button.reset"),
-                Text.translatable("entityseparator.button.reset.narrator"),
+                Resources.IDShort.RESET,
+                Resources.Translation.BUTTON_RESET,
+                Resources.Translation.BUTTON_RESET,
                 ListWidget.Entry::reset,
                 entry -> this.rule.setTexture(entry.getValue()),
                 entry -> this.updateDoneEnabled()
@@ -223,7 +219,7 @@ public class EditScreen extends Screen {
     public void close() {
         if (listWidget.hasChanged())
             Objects.requireNonNull(client).setScreen(new ConfirmScreen(this,
-                    Text.translatable("entityseparator.confirmsave.title"),
+                    Resources.Translation.CONFIRM_SAVE_TITLE,
                     choice -> {
                         if (choice == ConfirmScreen.Choice.YES) {
                             this.save();

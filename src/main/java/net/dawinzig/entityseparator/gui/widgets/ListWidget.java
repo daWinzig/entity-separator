@@ -1,6 +1,7 @@
 package net.dawinzig.entityseparator.gui.widgets;
 
 import com.google.common.collect.ImmutableList;
+import net.dawinzig.entityseparator.Resources;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -219,7 +220,8 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
 
             @Override
             protected MutableText getNarrationMessage() {
-                return Text.translatable("entityseparator.slider.narrator", IntEntry.this.entryName, this.getMessage());
+                return MutableText.of(Resources.Translation.insert(Resources.Translation.SLIDER_NARRATOR,
+                        IntEntry.this.entryName, this.getMessage()).getContent());
             }
         }
     }
@@ -270,7 +272,8 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             else
                 this.toggleButton.setMessage(((MutableText) ScreenTexts.OFF).formatted(Formatting.RED));
 
-            this.toggleNarration = Text.translatable("entityseparator.toggle.narrator", this.entryName, this.toggleButton.getMessage());
+            this.toggleNarration = MutableText.of(Resources.Translation.insert(Resources.Translation.TOGGLE_NARRATOR,
+                    this.entryName, this.toggleButton.getMessage()).getContent());
 
             super.update();
         }

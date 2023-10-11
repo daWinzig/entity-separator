@@ -1,5 +1,6 @@
 package net.dawinzig.entityseparator.gui.screens;
 
+import net.dawinzig.entityseparator.Resources;
 import net.dawinzig.entityseparator.config.Config;
 import net.dawinzig.entityseparator.config.Option;
 import net.dawinzig.entityseparator.gui.toasts.MessageToast;
@@ -8,21 +9,18 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class SettingsScreen extends Screen {
-    private static final Text TITLE = Text.translatable("entityseparator.settings.title");
     private final Screen parent;
     private final ListWidget optionsList;
 
     protected SettingsScreen(Screen parent) {
-        super(TITLE);
+        super(Resources.Translation.TITLE_OPTIONS);
         this.parent = parent;
 
         this.optionsList = new ListWidget(this, MinecraftClient.getInstance());
@@ -50,9 +48,9 @@ public class SettingsScreen extends Screen {
                     Text.of(option.getDisplayName()), Text.of(option.getTooltip()),
                     ((Option.Bool) option).getValue(), ((Option.Bool) option).getDefaultValue(),
                     ListWidget.FunctionEnable.ON_CHANGED,
-                    new Identifier("entityseparator", "reset"),
-                    Text.translatable("entityseparator.button.reset"),
-                    Text.translatable("entityseparator.button.reset.narrator"),
+                    Resources.IDShort.RESET,
+                    Resources.Translation.BUTTON_RESET,
+                    Resources.Translation.BUTTON_RESET,
                     entry -> {
                         entry.focusOn(entry.children().get(0));
                         entry.reset();
@@ -65,9 +63,9 @@ public class SettingsScreen extends Screen {
                     Text.of(option.getDisplayName()), Text.of(option.getTooltip()),
                     ((Option.Str) option).getValue(), ((Option.Str) option).getDefaultValue(),
                     ListWidget.FunctionEnable.ON_CHANGED,
-                    new Identifier("entityseparator", "reset"),
-                    Text.translatable("entityseparator.button.reset"),
-                    Text.translatable("entityseparator.button.reset.narrator"),
+                    Resources.IDShort.RESET,
+                    Resources.Translation.BUTTON_RESET,
+                    Resources.Translation.BUTTON_RESET,
                     entry -> {
                         entry.focusOn(entry.children().get(0));
                         entry.reset();
@@ -81,9 +79,9 @@ public class SettingsScreen extends Screen {
                     ((Option.Int) option).getValue(), ((Option.Int) option).getDefaultValue(),
                     ((Option.Int) option).getMin(), ((Option.Int) option).getMax(),
                     ListWidget.FunctionEnable.ON_CHANGED,
-                    new Identifier("entityseparator", "reset"),
-                    Text.translatable("entityseparator.button.reset"),
-                    Text.translatable("entityseparator.button.reset.narrator"),
+                    Resources.IDShort.RESET,
+                    Resources.Translation.BUTTON_RESET,
+                    Resources.Translation.BUTTON_RESET,
                     entry -> {
                         entry.focusOn(entry.children().get(0));
                         entry.reset();
@@ -99,11 +97,11 @@ public class SettingsScreen extends Screen {
         optionsList.update();
         this.addSelectableChild(this.optionsList);
 
-        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.CANCEL, (button) ->
+        this.addDrawableChild(ButtonWidget.builder(Resources.Translation.BUTTON_CANCEL, (button) ->
             Objects.requireNonNull(this.client).setScreen(this.parent)
         ).dimensions(this.width / 2 - 155, this.height - 29, 150, 20).build());
 
-        this.addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> this.save()
+        this.addDrawableChild(ButtonWidget.builder(Resources.Translation.BUTTON_SAVE_EXIT, (button) -> this.save()
         ).dimensions(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
     }
 
@@ -123,7 +121,7 @@ public class SettingsScreen extends Screen {
     public void close() {
         if (optionsList.hasChanged())
             Objects.requireNonNull(client).setScreen(new ConfirmScreen(this,
-                    Text.translatable("entityseparator.confirmsave.title"),
+                    Resources.Translation.CONFIRM_SAVE_TITLE,
                     choice -> {
                         if (choice == ConfirmScreen.Choice.YES) this.save();
                         else Objects.requireNonNull(this.client).setScreen(this.parent);
@@ -137,7 +135,7 @@ public class SettingsScreen extends Screen {
         if (!Config.IO.saveConfig())
             Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
                     this.client,
-                    Text.translatable("entityseparator.toast.save.failed", "config"),
+                    Resources.Translation.insert(Resources.Translation.TOAST_SAVE_FAILED, "config"),
                     MessageToast.Level.ERROR
             ));
 

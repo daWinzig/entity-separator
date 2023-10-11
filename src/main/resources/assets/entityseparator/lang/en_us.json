@@ -2,29 +2,27 @@
   "entityseparator.category.main": "Entity Separator",
   "entityseparator.key.menu": "Open Menu",
 
-  "entityseparator.toast.reload": "\"%s\" reloaded!",
-  "entityseparator.toast.delete.success": "Deleted",
-  "entityseparator.toast.delete.failed": "Deletion failed...",
+  "entityseparator.toast.reload": "%s reloaded!",
+  "entityseparator.toast.save.failed": "Failed to save: %s!",
 
   "entityseparator.toggle.narrator": "toggle %s is %s",
   "entityseparator.slider.narrator": "slider %s has the value %s",
 
-  "entityseparator.button.editordelete": "Edit/Delete...",
-  "entityseparator.button.editordelete.narrator": "edit or delete",
+  "entityseparator.button.save.exit": "Save and Exit",
+  "entityseparator.button.done": "Done",
+  "entityseparator.button.cancel": "Cancel",
+  "entityseparator.button.options": "Options",
+  "entityseparator.button.edit_or_delete": "Edit/Delete",
+  "entityseparator.button.edit_or_delete.narrator": "edit or delete",
   "entityseparator.button.reload": "Reload",
   "entityseparator.button.reset": "Reset",
+  "entityseparator.button.new": "Add New",
   "entityseparator.button.delete": "Delete",
+  "entityseparator.button.restore": "Restore",
   "entityseparator.button.open": "Open Folder...",
 
-  "entityseparator.list.title": "Separator Rules",
-  "entityseparator.list.button.add": "Add New...",
-  "entityseparator.list.button.options": "Configure...",
-
-  "entityseparator.settings.title": "Entity Separator Options",
-
-  "entityseparator.add.title": "New Rule",
-  "entityseparator.edit.title": "Edit Rule",
-
+  "entityseparator.title.add": "New Rule",
+  "entityseparator.title.edit": "Edit Rule (%s)",
   "entityseparator.rule.name": "Name",
   "entityseparator.rule.entities": "Entity Types",
   "entityseparator.rule.path": "Target Path",
@@ -34,5 +32,16 @@
   "entityseparator.rule.pattern.name": "Pattern with Name",
   "entityseparator.rule.distance": "Max Distance",
   "entityseparator.rule.texture": "Custom Texture",
-  "entityseparator.rule.texture.tooltip": "leave blank for default"
+  "entityseparator.rule.texture.tooltip": "leave blank for default",
+
+  "entityseparator.title.rules": "Separator Rules",
+  "entityseparator.rules.category.on_disk": "On Disk",
+  "entityseparator.rules.category.on_disk.tooltip": "already existing rules",
+  "entityseparator.rules.category.created": "Newly Created",
+  "entityseparator.rules.category.created.tooltip": "rules will be created on save",
+  "entityseparator.rules.category.deleted": "Deleted",
+  "entityseparator.rules.category.deleted.tooltip": "rules will be deleted on save",
+
+  "entityseparator.title.options": "Entity Separator Options",
+  "entityseparator.confirm.save.title": "Save Changes?"
 }
