@@ -5,7 +5,7 @@
 <br/>(default: L-Alt, can be changed in keybindings)</p>
 <h3>Already included Rules</h3>
 <ul>
-<li><b>Screaming Goats:</b> Shows an NameTag with "Screaming Goat" or their name in gold. Also changes their texture slightly.</li>
+<li><b>Screaming Goats:</b> Shows an NameTag with "Screaming Goat" in gold. Also changes their texture slightly.</li>
 <li><b>Panda Genes:</b> Shows an NameTag with their Main- and Hidden Gene</li>
 <li><b>Llama Strength:</b> Shows their strength if it is either 4 or 5 on their NameTag.</li>
 </ul>
