@@ -226,7 +226,6 @@ public class RulesScreen extends Screen {
 
     private void save() {
         boolean success = true;
-        boolean saveConfig = this.rulesList.hasChanged() || !this.pendingDelete.isEmpty() || !this.pendingCreation.isEmpty();
 
         this.rulesList.save();
 
@@ -278,7 +277,8 @@ public class RulesScreen extends Screen {
             }
         }
 
-        if (saveConfig) Config.IO.saveConfig();
+        if (this.rulesList.hasChanged() || !this.pendingDelete.isEmpty() || !this.pendingCreation.isEmpty())
+            Config.IO.saveEnabled();
 
         if (success) Objects.requireNonNull(this.client).setScreen(this.parent);
         else {

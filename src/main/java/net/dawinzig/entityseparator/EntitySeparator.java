@@ -29,7 +29,8 @@ public class EntitySeparator implements ClientModInitializer {
 			}
 		});
 
-		Config.IO.loadAllRules();
 		Config.IO.loadConfig();
+		Config.IO.loadAllRules();
+		Config.IO.loadEnabled();
 	}
 }
