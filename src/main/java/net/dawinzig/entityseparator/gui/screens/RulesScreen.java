@@ -22,6 +22,7 @@ public class RulesScreen extends Screen {
     private final Set<Path> pendingDelete;
     private final Map<Rule, Boolean> pendingCreation;
     private final Map<Path, Rule> pendingUpdate;
+    private final Map<Path, Boolean> rulesEnabled;
     private final ButtonWidget reloadButton;
     private final ButtonWidget openButton;
     private final ButtonWidget addButton;
@@ -33,6 +34,8 @@ public class RulesScreen extends Screen {
         this.client = MinecraftClient.getInstance();
 
         this.rulesList = new ListWidget(this, this.client);
+        this.rulesEnabled = new LinkedHashMap<>();
+        Config.RULES.keySet().forEach(path -> this.rulesEnabled.put(path, Config.isRuleEnabled(path)));
         this.pendingDelete = new TreeSet<>();
         this.pendingCreation = new LinkedHashMap<>();
         this.pendingUpdate = new HashMap<>();
@@ -93,16 +96,17 @@ public class RulesScreen extends Screen {
                 usedRule = rule.copy();
                 name = usedRule.getName();
             }
+            this.rulesEnabled.putIfAbsent(path, false);
             this.rulesList.addEntry(
                     Text.of(name), Text.of(path.toString()),
-                    Config.isRuleEnabled(path), false,
+                    this.rulesEnabled.getOrDefault(path, false), false,
                     ListWidget.FunctionEnable.ENABLED,
                     Resources.IDShort.EDIT,
                     Resources.Translation.BUTTON_EDIT_OR_DELETE,
                     Resources.Translation.BUTTON_EDIT_OR_DELETE_NARRATOR,
                     entry -> Objects.requireNonNull(this.client).setScreen(new EditScreen(this, usedRule, rule, path)),
-                    entry -> {},
-                    entry -> Config.setRuleEnabled(path, entry.getValue())
+                    entry -> Config.setRuleEnabled(path, entry.getValue()),
+                    entry -> rulesEnabled.put(path, entry.getValue())
             );
         });
         this.rulesList.addHeader(Resources.Translation.RULES_CATEGORY_CREATED, Resources.Translation.RULES_CATEGORY_CREATED_TOOLTIP);
@@ -115,8 +119,8 @@ public class RulesScreen extends Screen {
                     Resources.Translation.BUTTON_EDIT_OR_DELETE,
                     Resources.Translation.BUTTON_EDIT_OR_DELETE_NARRATOR,
                     entry -> Objects.requireNonNull(this.client).setScreen(new EditScreen(this, rule)),
-                    entry -> {},
-                    entry -> this.pendingCreation.put(rule, entry.getValue())
+                    entry -> this.pendingCreation.put(rule, entry.getValue()),
+                    entry -> {}
             )
         );
         this.rulesList.addHeader(Resources.Translation.RULES_CATEGORY_DELETED, Resources.Translation.RULES_CATEGORY_DELETED_TOOLTIP);
@@ -196,9 +200,18 @@ public class RulesScreen extends Screen {
         this.renderBackgroundTexture(context);
     }
 
+    private boolean enableChanged() {
+        for (Path path : Config.RULES.keySet()) {
+            boolean a = Config.isRuleEnabled(path);
+            boolean b = this.rulesEnabled.getOrDefault(path, a);
+            if (a != b) return true;
+        }
+        return false;
+    }
+
     @Override
     public void close() {
-        if (this.rulesList.hasChanged() || !this.pendingDelete.isEmpty() || !this.pendingCreation.isEmpty() ||
+        if (this.enableChanged() || !this.pendingDelete.isEmpty() || !this.pendingCreation.isEmpty() ||
                 !this.pendingUpdate.isEmpty() || !Config.SAVE_FAILED.isEmpty())
             Objects.requireNonNull(client).setScreen(new ConfirmScreen(this,
                     Resources.Translation.CONFIRM_SAVE_TITLE,
@@ -262,7 +275,7 @@ public class RulesScreen extends Screen {
             }
         }
 
-        if (this.rulesList.hasChanged() || !this.pendingDelete.isEmpty() || !this.pendingCreation.isEmpty())
+        if (this.enableChanged() || !this.pendingDelete.isEmpty() || !this.pendingCreation.isEmpty())
             Config.IO.saveEnabled();
 
         if (success) Objects.requireNonNull(this.client).setScreen(this.parent);
