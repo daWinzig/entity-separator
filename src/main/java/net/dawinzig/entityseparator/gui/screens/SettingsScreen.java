@@ -131,14 +131,15 @@ public class SettingsScreen extends Screen {
     }
 
     public void save() {
-        this.optionsList.save();
-        if (!Config.IO.saveConfig())
-            Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
-                    this.client,
-                    Resources.Translation.insert(Resources.Translation.TOAST_SAVE_FAILED, "config"),
-                    MessageToast.Level.ERROR
-            ));
-
+        if (this.optionsList.hasChanged()) {
+            this.optionsList.save();
+            if (!Config.IO.saveConfig())
+                Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
+                        this.client,
+                        Resources.Translation.insert(Resources.Translation.TOAST_SAVE_FAILED, "config"),
+                        MessageToast.Level.ERROR
+                ));
+        }
         Objects.requireNonNull(this.client).setScreen(this.parent);
     }
 }
