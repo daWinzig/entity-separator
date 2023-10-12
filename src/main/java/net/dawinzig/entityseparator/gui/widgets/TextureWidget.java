@@ -23,8 +23,9 @@ public class TextureWidget extends EmptyWidget implements Drawable {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         if (!this.isMouseOver(mouseX, mouseY))
-            context.drawGuiTexture(this.texture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            context.drawTexture(this.texture, this.getX(), this.getY(), 0, 0, this.getWidth(), this.getHeight(), this.getWidth(), this.getHeight());
         else
-            context.drawGuiTexture(this.hoveredTexture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            context.drawTexture(this.hoveredTexture, this.getX(), this.getY(), 0, 0,
+                    this.getWidth(), this.getHeight(), this.getWidth(), this.getHeight());
     }
 }

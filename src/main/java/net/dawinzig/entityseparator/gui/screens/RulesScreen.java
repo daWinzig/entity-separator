@@ -202,9 +202,9 @@ public class RulesScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
         this.rulesList.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 14, 16777215);
+        super.render(context, mouseX, mouseY, delta);
 
         //TEMP MobVote2023
         if (Config.OPTIONS.getValueOrDefault(false, "easter_eggs")) {

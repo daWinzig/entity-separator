@@ -77,11 +77,11 @@ public abstract class Resources {
         public static final Identifier EDIT = new Identifier(Resources.MOD_ID, "textures/gui/sprites/edit.png");
 
         //TEMP MobVote2023
-        public static final Identifier ARMADILLO_SURPRISED = new Identifier(Resources.MOD_ID, "mobvote2023/armadillo_surprised");
-        public static final Identifier ARMADILLO = new Identifier(Resources.MOD_ID, "mobvote2023/armadillo");
-        public static final Identifier CRAB_WAVE = new Identifier(Resources.MOD_ID, "mobvote2023/crab_wave");
-        public static final Identifier CRAB = new Identifier(Resources.MOD_ID, "mobvote2023/crab");
-        public static final Identifier PENGUIN_HAPPY = new Identifier(Resources.MOD_ID, "mobvote2023/penguin_happy");
-        public static final Identifier PENGUIN = new Identifier(Resources.MOD_ID, "mobvote2023/penguin");
+        public static final Identifier ARMADILLO_SURPRISED = new Identifier(Resources.MOD_ID, "textures/gui/sprites/mobvote2023/armadillo_surprised.png");
+        public static final Identifier ARMADILLO = new Identifier(Resources.MOD_ID, "textures/gui/sprites/mobvote2023/armadillo.png");
+        public static final Identifier CRAB_WAVE = new Identifier(Resources.MOD_ID, "textures/gui/sprites/mobvote2023/crab_wave.png");
+        public static final Identifier CRAB = new Identifier(Resources.MOD_ID, "textures/gui/sprites/mobvote2023/crab.png");
+        public static final Identifier PENGUIN_HAPPY = new Identifier(Resources.MOD_ID, "textures/gui/sprites/mobvote2023/penguin_happy.png");
+        public static final Identifier PENGUIN = new Identifier(Resources.MOD_ID, "textures/gui/sprites/mobvote2023/penguin.png");
     }
 }

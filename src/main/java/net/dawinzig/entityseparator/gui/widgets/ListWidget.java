@@ -112,7 +112,7 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             this.textField = new TextFieldWidget(ListWidget.this.client.textRenderer, 0, 0, this.mainWidth - 2, 18, entryName);
             this.textField.setMaxLength(Integer.MAX_VALUE);
             this.textField.setText(value);
-            this.textField.setCursorToStart(false);
+            this.textField.setCursorToStart();
             this.textField.setChangedListener(s -> {
                 this.value = s;
                 this.update(false);
