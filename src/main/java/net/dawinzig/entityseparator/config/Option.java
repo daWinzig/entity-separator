@@ -3,6 +3,7 @@ package net.dawinzig.entityseparator.config;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -11,12 +12,12 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 public abstract class Option<T> {
-    private final String displayName;
-    private final String tooltip;
+    private final Text displayName;
+    private final Text tooltip;
     private final T defaultValue;
     private T value;
 
-    Option(@Nullable String displayName, @Nullable String tooltip, @Nullable T value, @Nullable T defaultValue) {
+    Option(@Nullable Text displayName, @Nullable Text tooltip, @Nullable T value, @Nullable T defaultValue) {
         this.displayName = displayName;
         this.tooltip = tooltip;
         this.value = value;
@@ -26,11 +27,11 @@ public abstract class Option<T> {
     public boolean isShownInGUI() {
         return this.displayName != null;
     }
-    public String getDisplayName() {
-        return this.displayName == null ? "" : this.displayName;
+    public Text getDisplayName() {
+        return this.displayName == null ? Text.empty() : this.displayName;
     }
-    public String getTooltip() {
-        return this.tooltip == null ? "" : this.tooltip;
+    public Text getTooltip() {
+        return this.tooltip == null ? Text.empty() : this.tooltip;
     }
 
     public T getValue() {
@@ -50,7 +51,7 @@ public abstract class Option<T> {
         private final Map<String, Option<?>> children = new LinkedHashMap<>();
         private int depth = 0;
 
-        Category(@Nullable String displayName, @Nullable String tooltip) {
+        Category(@Nullable Text displayName, @Nullable Text tooltip) {
             super(displayName, tooltip, true, true);
         }
 
@@ -128,7 +129,7 @@ public abstract class Option<T> {
         private final int min;
         private final int max;
 
-        Int(@Nullable String displayName, @Nullable String tooltip, int value, int defaultValue, int min, int max) {
+        Int(@Nullable Text displayName, @Nullable Text tooltip, int value, int defaultValue, int min, int max) {
             super(displayName, tooltip, value, defaultValue);
 
             this.min = min;
@@ -155,7 +156,7 @@ public abstract class Option<T> {
     }
 
     public static class Bool extends Option<Boolean> {
-        Bool(@Nullable String displayName, @Nullable String tooltip, boolean value, boolean defaultValue) {
+        Bool(@Nullable Text displayName, @Nullable Text tooltip, boolean value, boolean defaultValue) {
             super(displayName, tooltip, value, defaultValue);
         }
 
@@ -172,7 +173,7 @@ public abstract class Option<T> {
     }
 
     public static class Str extends Option<String> {
-        Str(@Nullable String displayName, @Nullable String tooltip, String value, String defaultValue) {
+        Str(@Nullable Text displayName, @Nullable Text tooltip, String value, String defaultValue) {
             super(displayName, tooltip, value, defaultValue);
         }
 

@@ -53,6 +53,8 @@ public abstract class Resources {
 
         // options screen
         public static final Text TITLE_OPTIONS = Text.translatable(Resources.MOD_ID + ".title.options");
+        public static final Text OPTION_REGENERATE = Text.translatable(Resources.MOD_ID + ".option.regenerate");
+        public static final Text OPTION_REGENERATE_TOOLTIP = Text.translatable(Resources.MOD_ID + ".option.regenerate.tooltip");
 
         // confirm screen
         public static final Text CONFIRM_SAVE_TITLE = Text.translatable(Resources.MOD_ID + ".confirm.save.title");

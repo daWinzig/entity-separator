@@ -2,6 +2,7 @@ package net.dawinzig.entityseparator.config;
 
 import com.google.gson.*;
 import net.dawinzig.entityseparator.EntitySeparator;
+import net.dawinzig.entityseparator.Resources;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.util.PathUtil;
@@ -99,9 +100,7 @@ public class Config {
     }
     private static void generateDefaultConfig() {
         Config.OPTIONS.addChild("regenerate", new Option.Bool(
-                "Regenerate Default Rules",
-                "Regenerate Default Rules on (re-)load if not already present",
-                true, true));
+                Resources.Translation.OPTION_REGENERATE, Resources.Translation.OPTION_REGENERATE_TOOLTIP, true, true));
     }
     private static void setOptionsIfPresent(Option.Category category, JsonObject json) {
         category.foreach((key, option) -> {

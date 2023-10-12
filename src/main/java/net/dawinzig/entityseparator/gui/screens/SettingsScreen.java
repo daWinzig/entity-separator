@@ -9,7 +9,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +41,10 @@ public class SettingsScreen extends Screen {
     }
     private void addOption(Option<?> option, String[] path) {
         if (option instanceof Option.Category) {
-            this.optionsList.addHeader(Text.of(option.getDisplayName()), Text.of(option.getTooltip()));
+            this.optionsList.addHeader(option.getDisplayName(), option.getTooltip());
         } else if (option instanceof Option.Bool) {
             this.optionsList.addEntry(
-                    Text.of(option.getDisplayName()), Text.of(option.getTooltip()),
+                    option.getDisplayName(), option.getTooltip(),
                     ((Option.Bool) option).getValue(), ((Option.Bool) option).getDefaultValue(),
                     ListWidget.FunctionEnable.ON_CHANGED,
                     Resources.IDShort.RESET,
@@ -60,7 +59,7 @@ public class SettingsScreen extends Screen {
             );
         } else if (option instanceof Option.Str) {
             this.optionsList.addEntry(
-                    Text.of(option.getDisplayName()), Text.of(option.getTooltip()),
+                    option.getDisplayName(), option.getTooltip(),
                     ((Option.Str) option).getValue(), ((Option.Str) option).getDefaultValue(),
                     ListWidget.FunctionEnable.ON_CHANGED,
                     Resources.IDShort.RESET,
@@ -75,7 +74,7 @@ public class SettingsScreen extends Screen {
             );
         } else if (option instanceof Option.Int) {
             this.optionsList.addEntry(
-                    Text.of(option.getDisplayName()), Text.of(option.getTooltip()),
+                    option.getDisplayName(), option.getTooltip(),
                     ((Option.Int) option).getValue(), ((Option.Int) option).getDefaultValue(),
                     ((Option.Int) option).getMin(), ((Option.Int) option).getMax(),
                     ListWidget.FunctionEnable.ON_CHANGED,
