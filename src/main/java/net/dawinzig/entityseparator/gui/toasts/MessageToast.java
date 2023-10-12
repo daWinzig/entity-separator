@@ -29,7 +29,7 @@ public class MessageToast implements Toast {
 
     @Override
     public Visibility draw(DrawContext context, ToastManager manager, long startTime) {
-        context.drawGuiTexture(TEXTURE, 0, 0, this.getWidth(), this.getHeight());
+        context.drawTexture(TEXTURE, 0, 0, 0, 0, this.getWidth(), this.getHeight());
         context.drawVerticalLine(4, 3, this.getHeight()-4, level.color);
         context.drawText(client.textRenderer, text, 15, 12, 16777215, false);
         int showTime = 2000;

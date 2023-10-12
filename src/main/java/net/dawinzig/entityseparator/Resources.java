@@ -68,13 +68,13 @@ public abstract class Resources {
         }
     }
     public abstract static class IDShort {
-        public static final Identifier RESET = new Identifier(Resources.MOD_ID, "reset");
-        public static final Identifier DELETE = new Identifier(Resources.MOD_ID, "delete");
-        public static final Identifier RELOAD = new Identifier(Resources.MOD_ID, "reload");
-        public static final Identifier ADD = new Identifier(Resources.MOD_ID, "add");
-        public static final Identifier OPTIONS = new Identifier(Resources.MOD_ID, "options");
-        public static final Identifier FOLDER = new Identifier(Resources.MOD_ID, "folder");
-        public static final Identifier EDIT = new Identifier(Resources.MOD_ID, "edit");
+        public static final Identifier RESET = new Identifier(Resources.MOD_ID, "textures/gui/sprites/reset.png");
+        public static final Identifier DELETE = new Identifier(Resources.MOD_ID, "textures/gui/sprites/delete.png");
+        public static final Identifier RELOAD = new Identifier(Resources.MOD_ID, "textures/gui/sprites/reload.png");
+        public static final Identifier ADD = new Identifier(Resources.MOD_ID, "textures/gui/sprites/add.png");
+        public static final Identifier OPTIONS = new Identifier(Resources.MOD_ID, "textures/gui/sprites/options.png");
+        public static final Identifier FOLDER = new Identifier(Resources.MOD_ID, "textures/gui/sprites/folder.png");
+        public static final Identifier EDIT = new Identifier(Resources.MOD_ID, "textures/gui/sprites/edit.png");
 
         //TEMP MobVote2023
         public static final Identifier ARMADILLO_SURPRISED = new Identifier(Resources.MOD_ID, "mobvote2023/armadillo_surprised");

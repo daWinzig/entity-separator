@@ -4,6 +4,7 @@ import net.dawinzig.entityseparator.Resources;
 import net.dawinzig.entityseparator.config.Config;
 import net.dawinzig.entityseparator.config.Rule;
 import net.dawinzig.entityseparator.gui.toasts.MessageToast;
+import net.dawinzig.entityseparator.gui.widgets.IconButtonWidget;
 import net.dawinzig.entityseparator.gui.widgets.ListWidget;
 import net.dawinzig.entityseparator.gui.widgets.TextureWidget;
 import net.minecraft.client.MinecraftClient;
@@ -11,7 +12,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextIconButtonWidget;
 import net.minecraft.text.Text;
 
 import java.nio.file.Path;
@@ -48,8 +48,8 @@ public class RulesScreen extends Screen {
         this.pendingUpdate = new HashMap<>();
         this.reload();
 
-        reloadButton = TextIconButtonWidget.builder(
-                        Resources.Translation.BUTTON_RELOAD, (button) -> {
+        reloadButton = new IconButtonWidget(20, 20, Resources.IDShort.RELOAD, 16,16,
+                        (button) -> {
                             Config.RULES.clear();
                             Config.IO.loadAllRules();
                             this.reload();
@@ -59,30 +59,21 @@ public class RulesScreen extends Screen {
                                     Resources.Translation.insert(Resources.Translation.TOAST_RELOAD, Resources.Translation.TITLE_RULES),
                                     MessageToast.Level.INFO
                             ));
-                        }, true)
-                .texture(Resources.IDShort.RELOAD, 16, 16)
-                .dimension(20, 20).build();
+                        }, Resources.Translation.BUTTON_RELOAD);
         reloadButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_RELOAD));
 
-        openButton = TextIconButtonWidget.builder(Resources.Translation.BUTTON_OPEN, (button) -> Config.IO.openRulesFolder(),true)
-                .texture(Resources.IDShort.FOLDER, 16, 16)
-                .dimension(20, 20).build();
+        openButton = new IconButtonWidget(20, 20, Resources.IDShort.FOLDER, 16, 16,
+                (button) -> Config.IO.openRulesFolder(), Resources.Translation.BUTTON_OPEN);
         openButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_OPEN));
 
-        addButton = TextIconButtonWidget.builder(
-                        Resources.Translation.BUTTON_NEW,
-                        (button) -> Objects.requireNonNull(client).setScreen(new EditScreen(this)),
-                        true)
-                .texture(Resources.IDShort.ADD, 16, 16)
-                .dimension(20, 20).build();
+        addButton = new IconButtonWidget(20, 20, Resources.IDShort.ADD, 16, 16,
+                (button) -> Objects.requireNonNull(client).setScreen(new EditScreen(this)),
+                Resources.Translation.BUTTON_NEW);
         addButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_NEW));
 
-        optionsButton = TextIconButtonWidget.builder(
-                        Resources.Translation.BUTTON_OPTIONS,
-                        button -> Objects.requireNonNull(client).setScreen(new SettingsScreen(this)),
-                        true)
-                .texture(Resources.IDShort.OPTIONS, 16, 16)
-                .dimension(20, 20).build();
+        optionsButton = new IconButtonWidget(20, 20, Resources.IDShort.OPTIONS, 16, 16,
+                (button) -> Objects.requireNonNull(client).setScreen(new SettingsScreen(this)),
+                Resources.Translation.BUTTON_OPTIONS);
         optionsButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_OPTIONS));
 
         //TEMP MobVote2023
@@ -223,8 +214,12 @@ public class RulesScreen extends Screen {
         }
     }
 
-    @Override
+    @SuppressWarnings("unused")
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.renderBackgroundTexture(context);
+    }
+    @SuppressWarnings("unused")
+    public void renderBackground(DrawContext context) {
         this.renderBackgroundTexture(context);
     }
 

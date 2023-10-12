@@ -111,8 +111,12 @@ public class SettingsScreen extends Screen {
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 14, 16777215);
     }
 
-    @Override
+    @SuppressWarnings("unused")
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.renderBackgroundTexture(context);
+    }
+    @SuppressWarnings("unused")
+    public void renderBackground(DrawContext context) {
         this.renderBackgroundTexture(context);
     }
 

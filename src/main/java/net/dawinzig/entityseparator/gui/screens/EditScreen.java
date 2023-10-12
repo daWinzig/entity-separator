@@ -2,13 +2,13 @@ package net.dawinzig.entityseparator.gui.screens;
 
 import net.dawinzig.entityseparator.Resources;
 import net.dawinzig.entityseparator.config.Rule;
+import net.dawinzig.entityseparator.gui.widgets.IconButtonWidget;
 import net.dawinzig.entityseparator.gui.widgets.ListWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextIconButtonWidget;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -51,17 +51,16 @@ public class EditScreen extends Screen {
         this.path = path;
 
         if (!this.isNew) {
-            this.deleteButton = TextIconButtonWidget.builder(
-                    Resources.Translation.BUTTON_DELETE, button -> {
-                            if (this.path != null) {
-                                parent.setPendingDelete(this.path);
-                            } else {
-                                parent.removePendingCreation(rule);
-                            }
-                            Objects.requireNonNull(this.client).setScreen(this.parent);
-                        }, true)
-                    .texture(Resources.IDShort.DELETE, 16, 16)
-                    .dimension(20, 20).build();
+            this.deleteButton = new IconButtonWidget(
+                    20 , 20, Resources.IDShort.DELETE, 16, 16,
+                    button -> {
+                        if (this.path != null) {
+                            parent.setPendingDelete(this.path);
+                        } else {
+                            parent.removePendingCreation(rule);
+                        }
+                        Objects.requireNonNull(this.client).setScreen(this.parent);
+                    }, Resources.Translation.BUTTON_DELETE);
             deleteButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_DELETE));
         } else this.deleteButton = null;
 
@@ -197,8 +196,12 @@ public class EditScreen extends Screen {
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 14, 16777215);
     }
 
-    @Override
+    @SuppressWarnings("unused")
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        this.renderBackgroundTexture(context);
+    }
+    @SuppressWarnings("unused")
+    public void renderBackground(DrawContext context) {
         this.renderBackgroundTexture(context);
     }
 

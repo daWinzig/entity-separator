@@ -14,7 +14,6 @@ import net.minecraft.client.gui.widget.*;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
@@ -110,7 +109,7 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             super(ListWidget.this, entryName, tooltipText, initialValue, defaultValue, functionEnable, functionIcon,
                     functionTooltip, functionNarration, functionConsumer, saveConsumer, changeConsumer);
 
-            this.textField = new TextFieldWidget(ListWidget.this.client.textRenderer, this.mainWidth - 2, 18, entryName);
+            this.textField = new TextFieldWidget(ListWidget.this.client.textRenderer, 0, 0, this.mainWidth - 2, 18, entryName);
             this.textField.setMaxLength(Integer.MAX_VALUE);
             this.textField.setText(value);
             this.textField.setCursorToStart(false);
@@ -316,8 +315,8 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
                            int mouseX, int mouseY, boolean hovered, float tickDelta) {
             super.render(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
 
-            context.drawHorizontalLine(x+3, x+entryWidth/2-this.label.getWidth()/2-6, y+entryHeight/2+1, Colors.LIGHT_GRAY);
-            context.drawHorizontalLine(x+entryWidth/2+this.label.getWidth()/2+6, x+entryWidth-3, y+entryHeight/2+1, Colors.LIGHT_GRAY);
+            context.drawHorizontalLine(x+3, x+entryWidth/2-this.label.getWidth()/2-6, y+entryHeight/2+1, ColorHelper.Argb.getArgb(255,128,128,128));
+            context.drawHorizontalLine(x+entryWidth/2+this.label.getWidth()/2+6, x+entryWidth-3, y+entryHeight/2+1, ColorHelper.Argb.getArgb(255,128,128,128));
         }
 
         @Override
@@ -362,11 +361,8 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             this.label = new TextWidget(entryName, parent.client.textRenderer);
             label.setTooltip(Tooltip.of(tooltipText != null ? tooltipText : Text.of("")));
 
-            this.functionButton = TextIconButtonWidget.builder(
-                            entryName.copy().append(" ").append(functionNarration),
-                            button -> functionConsumer.accept(this), true)
-                    .texture(functionIcon, 16, 16)
-                    .dimension(20, 20).build();
+            this.functionButton = new IconButtonWidget(20, 20, functionIcon, 16, 16,
+                    button -> functionConsumer.accept(this), entryName.copy().append(" ").append(functionNarration));
 
             if (this.functionEnable == FunctionEnable.ENABLED)
                 this.functionButton.setTooltip(Tooltip.of(this.functionTooltip, Text.of("")));
