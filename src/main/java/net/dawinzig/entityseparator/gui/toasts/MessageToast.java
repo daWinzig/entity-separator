@@ -37,7 +37,6 @@ public class MessageToast implements Toast {
     }
 
     public enum Level {
-        SUCCESS(ColorHelper.Argb.getArgb(255,50,255,50)),
         INFO(ColorHelper.Argb.getArgb(255,200,200,200)),
         ERROR(ColorHelper.Argb.getArgb(255,255,50,50));
 

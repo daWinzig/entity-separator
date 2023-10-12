@@ -30,9 +30,6 @@ public class EditScreen extends Screen {
     protected EditScreen(RulesScreen parent, Rule rule) {
         this(parent, rule, null, null);
     }
-    protected EditScreen(RulesScreen parent, Rule rule, Rule defaultRule) {
-        this(parent, rule, defaultRule, null);
-    }
     protected EditScreen(RulesScreen parent, Rule rule, Rule defaultRule, Path path) {
         super(path != null
                 ? Resources.Translation.insert(Resources.Translation.TITLE_EDIT, path)

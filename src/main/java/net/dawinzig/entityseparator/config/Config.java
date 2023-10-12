@@ -102,18 +102,6 @@ public class Config {
                 "Regenerate Default Rules",
                 "Regenerate Default Rules on (re-)load if not already present",
                 true, true));
-
-//        Option.Category test_tt = new Option.Category("Hello World", "this is a test with tooltips");
-//        Config.OPTIONS.addChild("test_tt", test_tt);
-//        test_tt.addChild("bool", new Option.Bool("Bool Test", "boolean with tooltip", false, false));
-//        test_tt.addChild("str", new Option.Str("Str Test", "string with tooltip", "Content", "Content"));
-//        test_tt.addChild("int", new Option.Int("Int Test", "integer with tooltip", 4, 4, 0, 10));
-//
-//        Option.Category test = new Option.Category("Hello World", null);
-//        Config.OPTIONS.addChild("test", test);
-//        test.addChild("bool", new Option.Bool("Bool Test", null, false, false));
-//        test.addChild("str", new Option.Str("Str Test", null, "Content", "Content"));
-//        test.addChild("int", new Option.Int("Int Test", null, 4, 4, 0, 10));
     }
     private static void setOptionsIfPresent(Option.Category category, JsonObject json) {
         category.foreach((key, option) -> {
