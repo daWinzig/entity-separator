@@ -101,6 +101,8 @@ public class Config {
     private static void generateDefaultConfig() {
         Config.OPTIONS.addChild("regenerate", new Option.Bool(
                 Resources.Translation.OPTION_REGENERATE, Resources.Translation.OPTION_REGENERATE_TOOLTIP, true, true));
+        Config.OPTIONS.addChild("easter_eggs", new Option.Bool(
+                Resources.Translation.OPTION_EASTER_EGGS, null, true, true));
     }
     private static void setOptionsIfPresent(Option.Category category, JsonObject json) {
         category.foreach((key, option) -> {

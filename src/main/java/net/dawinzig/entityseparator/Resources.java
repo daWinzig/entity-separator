@@ -55,6 +55,7 @@ public abstract class Resources {
         public static final Text TITLE_OPTIONS = Text.translatable(Resources.MOD_ID + ".title.options");
         public static final Text OPTION_REGENERATE = Text.translatable(Resources.MOD_ID + ".option.regenerate");
         public static final Text OPTION_REGENERATE_TOOLTIP = Text.translatable(Resources.MOD_ID + ".option.regenerate.tooltip");
+        public static final Text OPTION_EASTER_EGGS = Text.translatable(Resources.MOD_ID + ".option.easter_eggs");
 
         // confirm screen
         public static final Text CONFIRM_SAVE_TITLE = Text.translatable(Resources.MOD_ID + ".confirm.save.title");
@@ -74,5 +75,13 @@ public abstract class Resources {
         public static final Identifier OPTIONS = new Identifier(Resources.MOD_ID, "options");
         public static final Identifier FOLDER = new Identifier(Resources.MOD_ID, "folder");
         public static final Identifier EDIT = new Identifier(Resources.MOD_ID, "edit");
+
+        //TEMP MobVote2023
+        public static final Identifier ARMADILLO_SURPRISED = new Identifier(Resources.MOD_ID, "mobvote2023/armadillo_surprised");
+        public static final Identifier ARMADILLO = new Identifier(Resources.MOD_ID, "mobvote2023/armadillo");
+        public static final Identifier CRAB_WAVE = new Identifier(Resources.MOD_ID, "mobvote2023/crab_wave");
+        public static final Identifier CRAB = new Identifier(Resources.MOD_ID, "mobvote2023/crab");
+        public static final Identifier PENGUIN_HAPPY = new Identifier(Resources.MOD_ID, "mobvote2023/penguin_happy");
+        public static final Identifier PENGUIN = new Identifier(Resources.MOD_ID, "mobvote2023/penguin");
     }
 }

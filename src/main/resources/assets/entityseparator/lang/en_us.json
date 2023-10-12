@@ -45,6 +45,7 @@
   "entityseparator.title.options": "Entity Separator Options",
   "entityseparator.option.regenerate": "Regenerate Default Rules",
   "entityseparator.option.regenerate.tooltip": "Regenerate Default Rules on (re-)load if not already present",
+  "entityseparator.option.easter_eggs": "Allow Easter Eggs",
 
   "entityseparator.confirm.save.title": "Save Changes?"
 }

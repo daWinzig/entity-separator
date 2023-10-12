@@ -5,6 +5,7 @@ import net.dawinzig.entityseparator.config.Config;
 import net.dawinzig.entityseparator.config.Rule;
 import net.dawinzig.entityseparator.gui.toasts.MessageToast;
 import net.dawinzig.entityseparator.gui.widgets.ListWidget;
+import net.dawinzig.entityseparator.gui.widgets.TextureWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -28,6 +29,11 @@ public class RulesScreen extends Screen {
     private final ButtonWidget openButton;
     private final ButtonWidget addButton;
     private final ButtonWidget optionsButton;
+
+    //TEMP MobVote2023
+    private final TextureWidget armadillo;
+    private final TextureWidget crab;
+    private final TextureWidget penguin;
 
     public RulesScreen(Screen parent) {
         super(Resources.Translation.TITLE_RULES);
@@ -78,6 +84,11 @@ public class RulesScreen extends Screen {
                 .texture(Resources.IDShort.OPTIONS, 16, 16)
                 .dimension(20, 20).build();
         optionsButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_OPTIONS));
+
+        //TEMP MobVote2023
+        this.armadillo = new TextureWidget(Resources.IDShort.ARMADILLO, Resources.IDShort.ARMADILLO_SURPRISED, 32, 32);
+        this.crab = new TextureWidget(Resources.IDShort.CRAB, Resources.IDShort.CRAB_WAVE, 36, 36);
+        this.penguin = new TextureWidget(Resources.IDShort.PENGUIN, Resources.IDShort.PENGUIN_HAPPY, 32, 32);
     }
 
     protected void reload() {
@@ -187,6 +198,15 @@ public class RulesScreen extends Screen {
 
         this.addDrawableChild(ButtonWidget.builder(Resources.Translation.BUTTON_SAVE_EXIT, (button) -> this.save()
         ).dimensions(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
+
+        //TEMP MobVote2023
+        this.armadillo.setX(this.width - 76);
+        this.armadillo.setY(0);
+        this.crab.setX(-3);
+        this.crab.setY(36);
+        this.penguin.setX(this.width - this.penguin.getWidth());
+        this.penguin.setY(this.height - this.penguin.getHeight());
+
     }
 
     @Override
@@ -194,6 +214,13 @@ public class RulesScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         this.rulesList.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 14, 16777215);
+
+        //TEMP MobVote2023
+        if (Config.OPTIONS.getValueOrDefault(false, "easter_eggs")) {
+            this.armadillo.render(context, mouseX, mouseY, delta);
+            this.crab.render(context, mouseX, mouseY, delta);
+            this.penguin.render(context, mouseX, mouseY, delta);
+        }
     }
 
     @Override
