@@ -89,10 +89,10 @@ public class RulesScreen extends Screen {
             String name;
             if (this.pendingUpdate.containsKey(path)) {
                 usedRule = this.pendingUpdate.get(path);
-                name = "*" + usedRule.getName();
+                name = "§o" + usedRule.getName() + "*";
             } else if (Config.SAVE_FAILED.contains(path)) {
                 usedRule = rule.copy();
-                name = "[!] " + usedRule.getName();
+                name = "§4[!]§r " + usedRule.getName();
             } else {
                 usedRule = rule.copy();
                 name = usedRule.getName();
