@@ -37,7 +37,7 @@ public abstract class NameTagMixin<T extends Entity> {
 
         List<Text> nameTagText = new ArrayList<>();
 		Config.RULES.forEach((path, rule) -> {
-			if (Config.isRuleEnabled(path) && rule.containsEntityType(entity.getType())) {
+			if (Config.ENABLED.getOrDefault(path, false) && rule.containsEntityType(entity.getType())) {
                 if (rule.shouldAddNameTag(nbt, d)) {
                     nameTagText.add(rule.getLabel(nbt));
                     ci.cancel();

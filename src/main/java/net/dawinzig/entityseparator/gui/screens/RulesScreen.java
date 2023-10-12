@@ -15,6 +15,7 @@ import net.minecraft.text.Text;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RulesScreen extends Screen {
     private final Screen parent;
@@ -35,7 +36,7 @@ public class RulesScreen extends Screen {
 
         this.rulesList = new ListWidget(this, this.client);
         this.rulesEnabled = new LinkedHashMap<>();
-        Config.RULES.keySet().forEach(path -> this.rulesEnabled.put(path, Config.isRuleEnabled(path)));
+        this.rulesEnabled.putAll(Config.ENABLED);
         this.pendingDelete = new TreeSet<>();
         this.pendingCreation = new LinkedHashMap<>();
         this.pendingUpdate = new HashMap<>();
@@ -105,7 +106,7 @@ public class RulesScreen extends Screen {
                     Resources.Translation.BUTTON_EDIT_OR_DELETE,
                     Resources.Translation.BUTTON_EDIT_OR_DELETE_NARRATOR,
                     entry -> Objects.requireNonNull(this.client).setScreen(new EditScreen(this, usedRule, rule, path)),
-                    entry -> Config.setRuleEnabled(path, entry.getValue()),
+                    entry -> Config.ENABLED.put(path, entry.getValue()),
                     entry -> rulesEnabled.put(path, entry.getValue())
             );
         });
@@ -202,7 +203,7 @@ public class RulesScreen extends Screen {
 
     private boolean enableChanged() {
         for (Path path : Config.RULES.keySet()) {
-            boolean a = Config.isRuleEnabled(path);
+            boolean a = Config.ENABLED.getOrDefault(path, false);
             boolean b = this.rulesEnabled.getOrDefault(path, a);
             if (a != b) return true;
         }
@@ -223,30 +224,29 @@ public class RulesScreen extends Screen {
             Objects.requireNonNull(this.client).setScreen(this.parent);}
 
     private void save() {
-        boolean success = true;
+        AtomicBoolean success = new AtomicBoolean(true);
+        boolean enabledChanged = this.enableChanged() || !this.pendingDelete.isEmpty() || !this.pendingCreation.isEmpty();
 
         this.rulesList.save();
 
-        for (Path path : Config.SAVE_FAILED) {
-            if (this.pendingUpdate.containsKey(path) || this.pendingDelete.contains(path)) continue;
+        Config.SAVE_FAILED.forEach(path -> {
+            if (this.pendingUpdate.containsKey(path) || this.pendingDelete.contains(path)) return;
             Config.RULES.put(path, Config.RULES.get(path));
             if (!Config.IO.saveRule(path, Config.RULES.get(path))) {
-                success = false;
+                success.set(false);
                 Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
                         this.client,
                         Resources.Translation.insert(Resources.Translation.TOAST_SAVE_FAILED, path),
                         MessageToast.Level.ERROR
                 ));
             }
-        }
+        });
 
-        for (Map.Entry<Path, Rule> entry : this.pendingUpdate.entrySet()) {
-            Path path = entry.getKey();
-            Rule rule = entry.getValue();
+        this.pendingUpdate.forEach((path, rule) -> {
             if (!this.pendingDelete.contains(path)) {
                 Config.RULES.put(path, rule);
                 if (!Config.IO.saveRule(path, rule)) {
-                    success = false;
+                    success.set(false);
                     Config.SAVE_FAILED.add(path);
                     Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
                             this.client,
@@ -255,17 +255,16 @@ public class RulesScreen extends Screen {
                     ));
                 }
             }
-        }
+        });
 
         this.pendingDelete.forEach(Config.IO::deleteRule);
 
-        for (Map.Entry<Rule, Boolean> entry : this.pendingCreation.entrySet()) {
-            Rule rule = entry.getKey();
+        this.pendingCreation.forEach((rule, value) -> {
             Path path = Config.IO.getAvailiableRelRulePath(Path.of(""), rule.getName());
             Config.RULES.put(path, rule);
-            Config.setRuleEnabled(path, entry.getValue());
+            Config.ENABLED.put(path, value);
             if (!Config.IO.saveRule(path, rule)) {
-                success = false;
+                success.set(false);
                 Config.SAVE_FAILED.add(path);
                 Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
                         this.client,
@@ -273,12 +272,11 @@ public class RulesScreen extends Screen {
                         MessageToast.Level.ERROR
                 ));
             }
-        }
+        });
 
-        if (this.enableChanged() || !this.pendingDelete.isEmpty() || !this.pendingCreation.isEmpty())
-            Config.IO.saveEnabled();
+        if (enabledChanged) Config.IO.saveEnabled();
 
-        if (success) Objects.requireNonNull(this.client).setScreen(this.parent);
+        if (success.get()) Objects.requireNonNull(this.client).setScreen(this.parent);
         else {
             this.pendingUpdate.clear();
             this.pendingDelete.clear();

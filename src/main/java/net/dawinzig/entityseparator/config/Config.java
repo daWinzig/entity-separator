@@ -19,7 +19,7 @@ public class Config {
     public static final Map<Path, Rule> RULES = new TreeMap<>();
     public static final Set<Path> SAVE_FAILED = new HashSet<>();
     public static final Option.Category OPTIONS = new Option.Category(null, null);
-    public static final Option.Category ENABLED = new Option.Category(null, null);
+    public static final HashMap<Path, Boolean> ENABLED = new HashMap<>();
 
     private static final String configFileName = "config.json";
     private static final String enabledFileName = "rules.json";
@@ -54,10 +54,11 @@ public class Config {
         return file;
     }
 
-    public boolean saveJson(File file, Option<?> option) {
+    public boolean saveJson(File file, JsonElement json) {
         Path relPath = this.basePath.relativize(file.toPath());
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String content = gson.toJson(option.asJson());
+
+        String content = gson.toJson(json);
         try (FileWriter fileWriter = new FileWriter(file)) {
             fileWriter.write(content);
         } catch (IOException e) {
@@ -82,18 +83,18 @@ public class Config {
     }
 
     public boolean saveConfig() {
-        return saveJson(this.configFile.toFile(), Config.OPTIONS);
+        return saveJson(this.configFile.toFile(), Config.OPTIONS.asJson());
     }
     public void loadConfig() {
         Config.generateDefaultConfig();
 
         JsonElement element = this.loadJson(configFile);
 
-        if (!(element instanceof JsonObject))
-            element = new JsonObject();
+        if (element instanceof JsonObject) {
+            Config.setOptionsIfPresent(Config.OPTIONS, (JsonObject) element);
+            EntitySeparator.LOGGER.info("Apply changes to config!");
+        }
 
-        Config.setOptionsIfPresent(Config.OPTIONS, (JsonObject) element);
-        EntitySeparator.LOGGER.info("Apply changes to config!");
         this.saveConfig();
     }
     private static void generateDefaultConfig() {
@@ -114,41 +115,6 @@ public class Config {
 //        test.addChild("str", new Option.Str("Str Test", null, "Content", "Content"));
 //        test.addChild("int", new Option.Int("Int Test", null, 4, 4, 0, 10));
     }
-
-
-    public void saveEnabled() {
-        saveJson(this.enabledFile.toFile(), Config.ENABLED);
-    }
-    public void loadEnabled() {
-        Config.generateEnabled();
-
-        JsonElement element = this.loadJson(this.enabledFile);
-
-        if (!(element instanceof JsonObject))
-            element = new JsonObject();
-
-        Config.setOptionsIfPresent(Config.ENABLED, (JsonObject) element);
-        EntitySeparator.LOGGER.info("Apply changes to enabled rules!");
-        this.saveEnabled();
-    }
-    private static void generateEnabled() {
-        Config.RULES.forEach((relPath, rule) -> setRuleEnabled(relPath, false));
-    }
-    public static boolean isRuleEnabled(Path relPath) {
-        Option.Bool ruleOption = Config.ENABLED.getBool(Config.pathToString(relPath));
-        if (ruleOption == null) return false;
-        return ruleOption.getValue();
-    }
-    public static void setRuleEnabled(Path relPath, boolean value) {
-        Option.Bool ruleOption = Config.ENABLED.getBool(Config.pathToString(relPath));
-        if (ruleOption == null) {
-            Config.ENABLED.addChild(
-                    Config.pathToString(relPath), new Option.Bool(null, null, value, false));
-            return;
-        }
-        ruleOption.setValue(value);
-    }
-
     private static void setOptionsIfPresent(Option.Category category, JsonObject json) {
         category.foreach((key, option) -> {
             if (json.has(key)) {
@@ -160,6 +126,29 @@ public class Config {
                 }
             }
         });
+    }
+
+    public void saveEnabled() {
+        JsonObject json = new JsonObject();
+        Config.ENABLED.forEach(((path, state) -> json.addProperty(Config.pathToString(path), state)));
+        this.saveJson(this.enabledFile.toFile(), json);
+    }
+    public void loadEnabled() {
+        JsonElement element = this.loadJson(this.enabledFile);
+
+        if (!(element instanceof JsonObject))
+            element = new JsonObject();
+
+        for (Path relPath : Config.RULES.keySet()) {
+            JsonElement child = ((JsonObject) element).get(Config.pathToString(relPath));
+            if (child != null && child.isJsonPrimitive() && child.getAsJsonPrimitive().isBoolean())
+                Config.ENABLED.put(relPath, child.getAsBoolean());
+            else
+                Config.ENABLED.put(relPath, false);
+        }
+
+        EntitySeparator.LOGGER.info("Apply changes to enabled rules!");
+        this.saveEnabled();
     }
 
     public void openRulesFolder() {
