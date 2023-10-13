@@ -27,7 +27,7 @@ public class IconButtonWidget extends ButtonWidget implements Drawable, Selectab
     @Override
     public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
         super.renderButton(context, mouseX, mouseY, delta);
-        context.drawTexture(this.texture, this.getX() + this.offsetX, this.getY() + this.offsetY,
-                0.0f, 0.0f, this.textureWidth, this.textureHeight, this.textureWidth, this.textureHeight);
+        context.drawGuiTexture(this.texture, this.getX() + this.offsetX, this.getY() + this.offsetY,
+                this.textureWidth, this.textureHeight);
     }
 }

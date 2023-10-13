@@ -1,5 +1,6 @@
 package net.dawinzig.entityseparator.gui.toasts;
 
+import net.dawinzig.entityseparator.Resources;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.toast.Toast;
@@ -11,7 +12,6 @@ import net.minecraft.util.math.ColorHelper;
 import java.util.Objects;
 
 public class MessageToast implements Toast {
-    private static final Identifier TEXTURE = new Identifier("toast/advancement");
     private final MinecraftClient client;
     private final Text text;
     private final Level level;
@@ -29,7 +29,7 @@ public class MessageToast implements Toast {
 
     @Override
     public Visibility draw(DrawContext context, ToastManager manager, long startTime) {
-        context.drawTexture(TEXTURE, 0, 0, 0, 0, this.getWidth(), this.getHeight());
+        context.drawGuiTexture(Resources.IDShort.TOAST_BACKGROUND, 0, 0, this.getWidth(), this.getHeight());
         context.drawVerticalLine(4, 3, this.getHeight()-4, level.color);
         context.drawText(client.textRenderer, text, 15, 12, 16777215, false);
         int showTime = 2000;
