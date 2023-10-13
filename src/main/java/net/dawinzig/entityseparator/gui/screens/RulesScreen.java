@@ -48,18 +48,18 @@ public class RulesScreen extends Screen {
         this.pendingUpdate = new HashMap<>();
         this.reload();
 
-        reloadButton = new IconButtonWidget(20, 20, Resources.IDShort.RELOAD, 16,16,
-                        (button) -> {
-                            Config.RULES.clear();
-                            Config.IO.loadAllRules();
-                            this.reload();
-                            assert this.client != null;
-                            this.client.getToastManager().add(new MessageToast(
-                                    this.client,
-                                    Resources.Translation.insert(Resources.Translation.TOAST_RELOAD, Resources.Translation.TITLE_RULES),
-                                    MessageToast.Level.INFO
-                            ));
-                        }, Resources.Translation.BUTTON_RELOAD);
+        reloadButton = new IconButtonWidget(20, 20, Resources.IDShort.RELOAD, 16, 16,
+                (button) -> {
+                    Config.RULES.clear();
+                    Config.IO.loadAllRules();
+                    this.reload();
+                    assert this.client != null;
+                    this.client.getToastManager().add(new MessageToast(
+                            this.client,
+                            Resources.Translation.insert(Resources.Translation.TOAST_RELOAD, Resources.Translation.TITLE_RULES),
+                            MessageToast.Level.INFO
+                    ));
+                }, Resources.Translation.BUTTON_RELOAD);
         reloadButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_RELOAD));
 
         openButton = new IconButtonWidget(20, 20, Resources.IDShort.FOLDER, 16, 16,
@@ -197,7 +197,6 @@ public class RulesScreen extends Screen {
         this.crab.setY(36);
         this.penguin.setX(this.width - this.penguin.getWidth());
         this.penguin.setY(this.height - this.penguin.getHeight());
-
     }
 
     @Override
@@ -208,9 +207,11 @@ public class RulesScreen extends Screen {
 
         //TEMP MobVote2023
         if (Config.OPTIONS.getValueOrDefault(false, "easter_eggs")) {
-            this.armadillo.render(context, mouseX, mouseY, delta);
-            this.crab.render(context, mouseX, mouseY, delta);
-            this.penguin.render(context, mouseX, mouseY, delta);
+            if ((System.currentTimeMillis() / 1000L) < 1697994000) {
+                this.armadillo.render(context, mouseX, mouseY, delta);
+                this.crab.render(context, mouseX, mouseY, delta);
+                this.penguin.render(context, mouseX, mouseY, delta);
+            }
         }
     }
 
