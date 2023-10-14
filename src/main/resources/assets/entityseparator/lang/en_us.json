@@ -29,6 +29,7 @@
   "entityseparator.rule.compare": "Compare against",
   "entityseparator.rule.compare.tooltip": "leave blank to check path existence",
   "entityseparator.rule.pattern": "Pattern",
+  "entityseparator.rule.inverted": "Invert Match",
   "entityseparator.rule.distance": "Max Distance",
   "entityseparator.rule.texture": "Custom Texture",
   "entityseparator.rule.texture.tooltip": "leave blank for default",
