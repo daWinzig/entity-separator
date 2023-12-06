@@ -25,7 +25,7 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
     final Screen parent;
 
     public ListWidget(Screen parent, MinecraftClient client) {
-        super(client, parent.width, parent.height, 32, parent.height - 32, 21);
+        super(client, parent.width, parent.height, 32, 21);
         this.parent = parent;
     }
 
@@ -81,7 +81,7 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
 
     @Override
     public int getMaxScroll() {
-        return Math.max(0, this.getMaxPosition() - (this.bottom - this.top - 7));
+        return Math.max(0, this.getMaxPosition() - this.getHeight() + 7);
     }
 
     @Override
@@ -90,7 +90,9 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
     }
 
     public void update() {
-        this.updateSize(parent.width, parent.height, 32, parent.height - 32);
+//        this.updateSize(parent.width, parent.height, 32, parent.height - 32);
+        this.setWidth(parent.width);
+        this.setHeight(parent.height - 64);
         if (this.getScrollAmount() > this.getMaxScroll()) this.setScrollAmount(this.getMaxScroll());
     }
 
