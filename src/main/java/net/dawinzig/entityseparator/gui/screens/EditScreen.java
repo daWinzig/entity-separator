@@ -145,6 +145,17 @@ public class EditScreen extends Screen {
                 }
         );
         listWidget.addEntry(
+                Resources.Translation.RULE_INVERTED, null,
+                this.rule.isInverted(), this.defaultRule.isInverted(),
+                ListWidget.FunctionEnable.ON_CHANGED,
+                Resources.IDShort.RESET,
+                Resources.Translation.BUTTON_RESET,
+                Resources.Translation.BUTTON_RESET,
+                ListWidget.Entry::reset,
+                entry -> this.rule.setInverted(entry.getValue()),
+                entry -> this.updateDoneEnabled()
+        );
+        listWidget.addEntry(
                 Resources.Translation.RULE_DISTANCE, null,
                 this.rule.getMaxDistance(), this.defaultRule.getMaxDistance(), 1, 128,
                 ListWidget.FunctionEnable.ON_CHANGED,

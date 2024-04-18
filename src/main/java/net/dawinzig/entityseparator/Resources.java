@@ -38,6 +38,7 @@ public abstract class Resources {
         public static final Text RULE_COMPARE = Text.translatable(Resources.MOD_ID + ".rule.compare");
         public static final Text RULE_COMPARE_TOOLTIP = Text.translatable(Resources.MOD_ID + ".rule.compare.tooltip");
         public static final Text RULE_PATTERN = Text.translatable(Resources.MOD_ID + ".rule.pattern");
+        public static final Text RULE_INVERTED = Text.translatable(Resources.MOD_ID + ".rule.inverted");
         public static final Text RULE_DISTANCE = Text.translatable(Resources.MOD_ID + ".rule.distance");
         public static final Text RULE_TEXTURE = Text.translatable(Resources.MOD_ID + ".rule.texture");
         public static final Text RULE_TEXTURE_TOOLTIP = Text.translatable(Resources.MOD_ID + ".rule.texture.tooltip");

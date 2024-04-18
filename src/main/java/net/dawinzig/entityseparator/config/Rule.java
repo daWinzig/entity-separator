@@ -19,6 +19,7 @@ public class Rule {
     private String name = "New Rule";
     private final HashSet<EntityType<?>> entityTypes = new HashSet<>();
     private NbtPathArgumentType.NbtPath path = null;
+    private boolean inverted = false;
     private boolean compareMode = false;
     private final HashSet<NbtElement> compare = new HashSet<>();
     private int maxDistance = 32;
@@ -42,6 +43,7 @@ public class Rule {
             this.compare.addAll(((NbtList) Objects.requireNonNull(nbtCompound.get("compare"))));
             this.compareMode = true;
         }
+        this.inverted = nbtCompound.getBoolean("inverted");
         if (nbtCompound.contains("texture"))
             this.texture = nbtCompound.getString("texture");
 
@@ -64,6 +66,7 @@ public class Rule {
             nbtList.addAll(this.compare);
             nbtCompound.put("compare", nbtList);
         }
+        nbtCompound.putBoolean("inverted", this.inverted);
         if (!Objects.equals(this.texture, ""))
             nbtCompound.putString("texture", this.texture);
 
@@ -78,15 +81,19 @@ public class Rule {
     }
     public boolean matchNbt(NbtCompound nbt) {
         NbtElement value;
+        boolean result = false;
         try {
             value = path.get(nbt).get(0);
-        } catch (CommandSyntaxException ignored) { return false; }
-        if (this.compareMode) {
-            for (NbtElement element : this.compare) {
-                if (value == element) return true;
-            }
-        } else return true;
-        return false;
+            if (this.compareMode) {
+                for (NbtElement element : this.compare) {
+                    if (value.equals(element)) {
+                        result = true;
+                        break;
+                    }
+                }
+            } else result = true;
+        } catch (CommandSyntaxException ignored) {}
+        return this.inverted != result;
     }
 
     public boolean isValid() {
@@ -135,6 +142,13 @@ public class Rule {
             }
         }
         return true;
+    }
+
+    public boolean isInverted() {
+        return this.inverted;
+    }
+    public void setInverted(boolean inverted) {
+        this.inverted = inverted;
     }
 
     public String getPath() {
@@ -244,6 +258,7 @@ public class Rule {
         rule.entityTypes.addAll(this.entityTypes);
         rule.path = this.path;
         rule.compareMode = this.compareMode;
+        rule.inverted = this.inverted;
         rule.setCompare(this.getCompare());
         rule.maxDistance = this.maxDistance;
         rule.labelPattern = this.labelPattern;
@@ -261,6 +276,7 @@ public class Rule {
         if (!Objects.equals(this.getPath(), ((Rule) other).getPath())) return false;
         if (!Objects.equals(this.compareMode, ((Rule) other).compareMode)) return false;
         if (!Objects.equals(this.compare, ((Rule) other).compare)) return false;
+        if (!Objects.equals(this.inverted, ((Rule) other).inverted)) return false;
         if (!Objects.equals(this.maxDistance, ((Rule) other).maxDistance)) return false;
         if (!Objects.equals(this.labelPattern, ((Rule) other).labelPattern)) return false;
         return Objects.equals(this.texture, ((Rule) other).texture);
