@@ -173,7 +173,7 @@ public class EditScreen extends Screen {
     protected void init() {
         if (deleteButton != null) {
             deleteButton.setX(this.width - 23);
-            deleteButton.setY(9);
+            deleteButton.setY(3);
             this.addDrawableChild(deleteButton);
         }
 
@@ -193,16 +193,7 @@ public class EditScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         this.listWidget.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 14, 16777215);
-    }
-
-    @SuppressWarnings("unused")
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackgroundTexture(context);
-    }
-    @SuppressWarnings("unused")
-    public void renderBackground(DrawContext context) {
-        this.renderBackgroundTexture(context);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 11, 16777215);
     }
 
     private void updateDoneEnabled() {

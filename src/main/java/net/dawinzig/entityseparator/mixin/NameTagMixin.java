@@ -20,7 +20,7 @@ import java.util.List;
 
 @Mixin(EntityRenderer.class)
 public abstract class NameTagMixin<T extends Entity> {
-	@Shadow protected abstract void renderLabelIfPresent(T entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light);
+	@Shadow protected abstract void renderLabelIfPresent(T entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float tickDelta);
 	@Shadow protected abstract boolean hasLabel(T entity);
 
 	@ModifyVariable(method = "renderLabelIfPresent", at = @At("STORE"), ordinal = 0)
@@ -51,7 +51,7 @@ public abstract class NameTagMixin<T extends Entity> {
 
 			matrices.push();
 			for (int i = nameTagText.size() - 1; i >= 0; i--) {
-				this.renderLabelIfPresent(entity, nameTagText.get(i), matrices, vertexConsumers, light);
+				this.renderLabelIfPresent(entity, nameTagText.get(i), matrices, vertexConsumers, light, tickDelta);
 				matrices.translate(0F, 0.25F, 0F);
 			}
 			matrices.pop();

@@ -5,6 +5,7 @@ import net.dawinzig.entityseparator.EntitySeparator;
 import net.dawinzig.entityseparator.Resources;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.util.PathUtil;
 import net.minecraft.util.Util;
 
@@ -146,7 +147,7 @@ public class Config {
 
     public boolean saveRule(Path relPath, Rule rule) {
         try {
-            NbtIo.writeCompressed(rule.asNbt(), this.getFile(rulesPath.resolve(relPath), false));
+            NbtIo.writeCompressed(rule.asNbt(), this.getFile(rulesPath.resolve(relPath), false).toPath());
         } catch (IOException e) {
             EntitySeparator.LOGGER.error("Failed to save rule: {}", relPath, e);
             return false;
@@ -191,7 +192,7 @@ public class Config {
 
     private void loadRule(Path relPath, File file) {
         try {
-            Config.RULES.put(relPath, new Rule(NbtIo.readCompressed(file)));
+            Config.RULES.put(relPath, new Rule(NbtIo.readCompressed(file.toPath(), NbtSizeTracker.ofUnlimitedBytes())));
         } catch (IOException | IllegalArgumentException e) {
             EntitySeparator.LOGGER.warn("Failed to load rule: {}", relPath, e);
         }

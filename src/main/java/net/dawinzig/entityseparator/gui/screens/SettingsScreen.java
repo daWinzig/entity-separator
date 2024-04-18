@@ -51,7 +51,7 @@ public class SettingsScreen extends Screen {
                     Resources.Translation.BUTTON_RESET,
                     Resources.Translation.BUTTON_RESET,
                     entry -> {
-                        entry.focusOn(entry.children().get(0));
+                        entry.setFocused(entry.children().get(0));
                         entry.reset();
                     },
                     entry -> Config.OPTIONS.getBool(path).setValue(entry.getValue()),
@@ -66,7 +66,7 @@ public class SettingsScreen extends Screen {
                     Resources.Translation.BUTTON_RESET,
                     Resources.Translation.BUTTON_RESET,
                     entry -> {
-                        entry.focusOn(entry.children().get(0));
+                        entry.setFocused(entry.children().get(0));
                         entry.reset();
                     },
                     entry -> Config.OPTIONS.getStr(path).setValue(entry.getValue()),
@@ -82,7 +82,7 @@ public class SettingsScreen extends Screen {
                     Resources.Translation.BUTTON_RESET,
                     Resources.Translation.BUTTON_RESET,
                     entry -> {
-                        entry.focusOn(entry.children().get(0));
+                        entry.setFocused(entry.children().get(0));
                         entry.reset();
                     },
                     entry -> Config.OPTIONS.getInt(path).setValue(entry.getValue()),
@@ -108,16 +108,7 @@ public class SettingsScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         this.optionsList.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 14, 16777215);
-    }
-
-    @SuppressWarnings("unused")
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackgroundTexture(context);
-    }
-    @SuppressWarnings("unused")
-    public void renderBackground(DrawContext context) {
-        this.renderBackgroundTexture(context);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 11, 16777215);
     }
 
     @Override

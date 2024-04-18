@@ -165,19 +165,19 @@ public class RulesScreen extends Screen {
         reload();
 
         reloadButton.setX(3);
-        reloadButton.setY(9);
+        reloadButton.setY(3);
         this.addDrawableChild(reloadButton);
 
         openButton.setX(26);
-        openButton.setY(9);
+        openButton.setY(3);
         this.addDrawableChild(openButton);
 
         addButton.setX(this.width - 46);
-        addButton.setY(9);
+        addButton.setY(3);
         this.addDrawableChild(addButton);
 
         optionsButton.setX(this.width - 23);
-        optionsButton.setY(9);
+        optionsButton.setY(3);
         this.addDrawableChild(optionsButton);
 
         rulesList.update();
@@ -203,7 +203,7 @@ public class RulesScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         this.rulesList.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 14, 16777215);
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 11, 16777215);
 
         //TEMP MobVote2023
         if (Config.OPTIONS.getValueOrDefault(false, "easter_eggs")) {
@@ -213,15 +213,6 @@ public class RulesScreen extends Screen {
                 this.penguin.render(context, mouseX, mouseY, delta);
             }
         }
-    }
-
-    @SuppressWarnings("unused")
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackgroundTexture(context);
-    }
-    @SuppressWarnings("unused")
-    public void renderBackground(DrawContext context) {
-        this.renderBackgroundTexture(context);
     }
 
     private boolean enableChanged() {

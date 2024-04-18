@@ -58,15 +58,6 @@ public class ConfirmScreen extends Screen {
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 14, 16777215);
     }
 
-    @SuppressWarnings("unused")
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackgroundTexture(context);
-    }
-    @SuppressWarnings("unused")
-    public void renderBackground(DrawContext context) {
-        this.renderBackgroundTexture(context);
-    }
-
         @Override
     public void close() {
         Objects.requireNonNull(client).setScreen(this.parent);
