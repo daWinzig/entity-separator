@@ -1,22 +1,22 @@
 package net.dawinzig.entityseparator.gui.widgets;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 
-public class IconButtonWidget extends ButtonWidget implements Drawable, Selectable {
-    private final Identifier texture;
+public class IconButtonWidget extends Button implements Renderable, NarratableEntry {
+    private final ResourceLocation texture;
     private final int textureWidth;
     private final int textureHeight;
     private final int offsetX;
     private final int offsetY;
 
-    public IconButtonWidget(int width, int height, Identifier texture, int textureWidth, int textureHeight, PressAction onPress, Text narration) {
-        super(0, 0, width, height, Text.empty(), onPress, (textSupplier) -> MutableText.of(narration.getContent()));
+    public IconButtonWidget(int width, int height, ResourceLocation texture, int textureWidth, int textureHeight, OnPress onPress, Component narration) {
+        super(0, 0, width, height, Component.empty(), onPress, (textSupplier) -> MutableComponent.create(narration.getContents()));
         this.texture = texture;
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
@@ -25,9 +25,9 @@ public class IconButtonWidget extends ButtonWidget implements Drawable, Selectab
     }
 
     @Override
-    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.renderWidget(context, mouseX, mouseY, delta);
-        context.drawGuiTexture(this.texture, this.getX() + this.offsetX, this.getY() + this.offsetY,
+        context.blitSprite(this.texture, this.getX() + this.offsetX, this.getY() + this.offsetY,
                 this.textureWidth, this.textureHeight);
     }
 }

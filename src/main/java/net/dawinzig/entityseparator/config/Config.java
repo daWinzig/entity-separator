@@ -4,11 +4,10 @@ import com.google.gson.*;
 import net.dawinzig.entityseparator.EntitySeparator;
 import net.dawinzig.entityseparator.Resources;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.FileUtil;
+import net.minecraft.Util;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtSizeTracker;
-import net.minecraft.util.PathUtil;
-import net.minecraft.util.Util;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -143,7 +142,7 @@ public class Config {
     }
 
     public void openRulesFolder() {
-        Util.getOperatingSystem().open(getFolder(rulesPath));
+        Util.getPlatform().openFile(getFolder(rulesPath));
     }
 
     public boolean saveRule(Path relPath, Rule rule) {
@@ -161,7 +160,7 @@ public class Config {
         getFolder(rulesPath);
         try {
             String fileName = name.toLowerCase(Locale.ROOT).replace(' ', '_');
-            fileName = PathUtil.getNextUniqueName(this.rulesPath.resolve(offset), fileName, Config.ruleFileExtension);
+            fileName = FileUtil.findAvailableName(this.rulesPath.resolve(offset), fileName, Config.ruleFileExtension);
             fileName = fileName.replace(" ", "");
             return offset.resolve(fileName);
         } catch (IOException e) {
@@ -193,7 +192,7 @@ public class Config {
 
     private void loadRule(Path relPath, File file) {
         try {
-            Config.RULES.put(relPath, new Rule(NbtIo.readCompressed(file.toPath(), NbtSizeTracker.ofUnlimitedBytes())));
+            Config.RULES.put(relPath, new Rule(NbtIo.readCompressed(file.toPath(), NbtAccounter.unlimitedHeap())));
         } catch (IOException | IllegalArgumentException e) {
             EntitySeparator.LOGGER.warn("Failed to load rule: {}", relPath, e);
         }

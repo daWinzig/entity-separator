@@ -5,11 +5,10 @@ import net.dawinzig.entityseparator.config.Config;
 import net.dawinzig.entityseparator.config.Option;
 import net.dawinzig.entityseparator.gui.toasts.MessageToast;
 import net.dawinzig.entityseparator.gui.widgets.ListWidget;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +21,7 @@ public class SettingsScreen extends Screen {
         super(Resources.Translation.TITLE_OPTIONS);
         this.parent = parent;
 
-        this.optionsList = new ListWidget(this, MinecraftClient.getInstance());
+        this.optionsList = new ListWidget(this, Minecraft.getInstance());
         this.getOptions();
     }
 
@@ -94,46 +93,46 @@ public class SettingsScreen extends Screen {
     @Override
     protected void init() {
         optionsList.update();
-        this.addSelectableChild(this.optionsList);
+        this.addWidget(this.optionsList);
 
-        this.addDrawableChild(ButtonWidget.builder(Resources.Translation.BUTTON_CANCEL, (button) ->
-            Objects.requireNonNull(this.client).setScreen(this.parent)
-        ).dimensions(this.width / 2 - 155, this.height - 29, 150, 20).build());
+        this.addRenderableWidget(Button.builder(Resources.Translation.BUTTON_CANCEL, (button) ->
+            Objects.requireNonNull(this.minecraft).setScreen(this.parent)
+        ).bounds(this.width / 2 - 155, this.height - 29, 150, 20).build());
 
-        this.addDrawableChild(ButtonWidget.builder(Resources.Translation.BUTTON_SAVE_EXIT, (button) -> this.save()
-        ).dimensions(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
+        this.addRenderableWidget(Button.builder(Resources.Translation.BUTTON_SAVE_EXIT, (button) -> this.save()
+        ).bounds(this.width / 2 - 155 + 160, this.height - 29, 150, 20).build());
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         this.optionsList.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 11, 16777215);
+        context.drawCenteredString(this.font, this.title, this.width / 2, 11, 16777215);
     }
 
     @Override
-    public void close() {
+    public void onClose() {
         if (optionsList.hasChanged())
-            Objects.requireNonNull(client).setScreen(new ConfirmScreen(this,
+            Objects.requireNonNull(minecraft).setScreen(new ConfirmScreen(this,
                     Resources.Translation.CONFIRM_SAVE_TITLE,
                     choice -> {
                         if (choice == ConfirmScreen.Choice.YES) this.save();
-                        else Objects.requireNonNull(this.client).setScreen(this.parent);
+                        else Objects.requireNonNull(this.minecraft).setScreen(this.parent);
                     }));
         else
-            Objects.requireNonNull(this.client).setScreen(this.parent);
+            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
     }
 
     public void save() {
         if (this.optionsList.hasChanged()) {
             this.optionsList.save();
             if (!Config.IO.saveConfig())
-                Objects.requireNonNull(this.client).getToastManager().add(new MessageToast(
-                        this.client,
+                Objects.requireNonNull(this.minecraft).getToasts().addToast(new MessageToast(
+                        this.minecraft,
                         Resources.Translation.insert(Resources.Translation.TOAST_SAVE_FAILED, "config"),
                         MessageToast.Level.ERROR
                 ));
         }
-        Objects.requireNonNull(this.client).setScreen(this.parent);
+        Objects.requireNonNull(this.minecraft).setScreen(this.parent);
     }
 }

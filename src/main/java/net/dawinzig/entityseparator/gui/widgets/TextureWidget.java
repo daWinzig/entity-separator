@@ -1,15 +1,15 @@
 package net.dawinzig.entityseparator.gui.widgets;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.widget.EmptyWidget;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.layouts.SpacerElement;
+import net.minecraft.resources.ResourceLocation;
 
-public class TextureWidget extends EmptyWidget implements Drawable {
-    private final Identifier texture;
-    private final Identifier hoveredTexture;
+public class TextureWidget extends SpacerElement implements Renderable {
+    private final ResourceLocation texture;
+    private final ResourceLocation hoveredTexture;
 
-    public TextureWidget(Identifier texture, Identifier hoveredTexture, int width, int height) {
+    public TextureWidget(ResourceLocation texture, ResourceLocation hoveredTexture, int width, int height) {
         super(width, height);
         this.texture = texture;
         this.hoveredTexture = hoveredTexture;
@@ -21,10 +21,10 @@ public class TextureWidget extends EmptyWidget implements Drawable {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         if (!this.isMouseOver(mouseX, mouseY))
-            context.drawGuiTexture(this.texture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            context.blitSprite(this.texture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
         else
-            context.drawGuiTexture(this.hoveredTexture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+            context.blitSprite(this.hoveredTexture, this.getX(), this.getY(), this.getWidth(), this.getHeight());
     }
 }

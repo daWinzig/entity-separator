@@ -4,12 +4,11 @@ import net.dawinzig.entityseparator.Resources;
 import net.dawinzig.entityseparator.config.Rule;
 import net.dawinzig.entityseparator.gui.widgets.IconButtonWidget;
 import net.dawinzig.entityseparator.gui.widgets.ListWidget;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.ButtonWidget;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.Screen;
 import java.nio.file.Path;
 import java.util.Objects;
 
@@ -18,10 +17,10 @@ public class EditScreen extends Screen {
     private final Rule rule;
     private final Rule defaultRule;
     private final Path path;
-    private final ButtonWidget deleteButton;
+    private final Button deleteButton;
     private final ListWidget listWidget;
-    private final ButtonWidget doneButton;
-    private final ButtonWidget cancelButton;
+    private final Button doneButton;
+    private final Button cancelButton;
     private final boolean isNew;
 
     protected EditScreen(RulesScreen parent) {
@@ -35,7 +34,7 @@ public class EditScreen extends Screen {
                 ? Resources.Translation.insert(Resources.Translation.TITLE_EDIT, path)
                 : Resources.Translation.TITLE_NEW);
         this.parent = parent;
-        this.client = MinecraftClient.getInstance();
+        this.minecraft = Minecraft.getInstance();
         if (rule == null) {
             this.rule = new Rule();
             this.isNew = true;
@@ -59,19 +58,19 @@ public class EditScreen extends Screen {
                         } else {
                             parent.removePendingCreation(rule);
                         }
-                        Objects.requireNonNull(this.client).setScreen(this.parent);
+                        Objects.requireNonNull(this.minecraft).setScreen(this.parent);
                     }, Resources.Translation.BUTTON_DELETE);
-            deleteButton.setTooltip(Tooltip.of(Resources.Translation.BUTTON_DELETE));
+            deleteButton.setTooltip(Tooltip.create(Resources.Translation.BUTTON_DELETE));
         } else this.deleteButton = null;
 
-        this.listWidget = new ListWidget(this, this.client);
+        this.listWidget = new ListWidget(this, this.minecraft);
 
-        this.cancelButton = ButtonWidget.builder(Resources.Translation.BUTTON_CANCEL, (button) ->
-                Objects.requireNonNull(this.client).setScreen(this.parent)
-        ).dimensions(this.width / 2 - 155, this.height - 29, 150, 20).build();
+        this.cancelButton = Button.builder(Resources.Translation.BUTTON_CANCEL, (button) ->
+                Objects.requireNonNull(this.minecraft).setScreen(this.parent)
+        ).bounds(this.width / 2 - 155, this.height - 29, 150, 20).build();
 
-        this.doneButton = ButtonWidget.builder(Resources.Translation.BUTTON_DONE, (button) -> this.save())
-                .dimensions(this.width / 2 + 5, this.height - 29, 150, 20).build();
+        this.doneButton = Button.builder(Resources.Translation.BUTTON_DONE, (button) -> this.save())
+                .bounds(this.width / 2 + 5, this.height - 29, 150, 20).build();
 
         listWidget.addEntry(
                 Resources.Translation.RULE_NAME, null,
@@ -185,26 +184,26 @@ public class EditScreen extends Screen {
         if (deleteButton != null) {
             deleteButton.setX(this.width - 23);
             deleteButton.setY(3);
-            this.addDrawableChild(deleteButton);
+            this.addRenderableWidget(deleteButton);
         }
 
         listWidget.update();
-        this.addSelectableChild(this.listWidget);
+        this.addWidget(this.listWidget);
 
         this.cancelButton.setX(this.width / 2 - 155);
         this.cancelButton.setY(this.height - 29);
-        this.addDrawableChild(this.cancelButton);
+        this.addRenderableWidget(this.cancelButton);
 
         this.doneButton.setX(this.width / 2 + 5);
         this.doneButton.setY(this.height - 29);
-        this.addDrawableChild(this.doneButton);
+        this.addRenderableWidget(this.doneButton);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         this.listWidget.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 11, 16777215);
+        context.drawCenteredString(this.font, this.title, this.width / 2, 11, 16777215);
     }
 
     private void updateDoneEnabled() {
@@ -218,19 +217,19 @@ public class EditScreen extends Screen {
     }
 
     @Override
-    public void close() {
+    public void onClose() {
         if (listWidget.hasChanged())
-            Objects.requireNonNull(client).setScreen(new ConfirmScreen(this,
+            Objects.requireNonNull(minecraft).setScreen(new ConfirmScreen(this,
                     Resources.Translation.CONFIRM_SAVE_TITLE,
                     choice -> {
                         if (choice == ConfirmScreen.Choice.YES) {
                             this.save();
                         }
                         else
-                            Objects.requireNonNull(this.client).setScreen(this.parent);
+                            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
                     }));
         else
-            Objects.requireNonNull(this.client).setScreen(this.parent);
+            Objects.requireNonNull(this.minecraft).setScreen(this.parent);
     }
 
     private void save() {
@@ -241,6 +240,6 @@ public class EditScreen extends Screen {
         }
         else if (this.isNew) this.parent.setPendingCreation(this.rule);
         parent.reload();
-        Objects.requireNonNull(this.client).setScreen(this.parent);
+        Objects.requireNonNull(this.minecraft).setScreen(this.parent);
     }
 }

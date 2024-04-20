@@ -2,12 +2,12 @@ package net.dawinzig.entityseparator.mixin;
 
 import net.dawinzig.entityseparator.config.Config;
 import net.dawinzig.entityseparator.config.Rule;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -16,15 +16,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(LivingEntityRenderer.class)
 public abstract class TextureMixin<T extends LivingEntity> {
     @SuppressWarnings("unchecked")
-    @Redirect(method = "getRenderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/LivingEntityRenderer;getTexture(Lnet/minecraft/entity/Entity;)Lnet/minecraft/util/Identifier;"))
-    private Identifier redirectExampleMethod(LivingEntityRenderer<T, EntityModel<T>> instance, Entity entity) {
+    @Redirect(method = "getRenderType", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;getTextureLocation(Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/resources/ResourceLocation;"))
+    private ResourceLocation getTextureLocation(LivingEntityRenderer<T, EntityModel<T>> instance, Entity entity) {
         for(Rule rule : Config.RULES.values()) {
             if (rule.containsEntityType(entity.getType()) && rule.hasTexture()) {
-                NbtCompound nbt = entity.writeNbt(new NbtCompound());
+                CompoundTag nbt = entity.saveWithoutId(new CompoundTag());
                 if (rule.matchNbt(nbt))
-                    return new Identifier(rule.getTexture());
+                    return new ResourceLocation(rule.getTexture());
             }
         }
-        return instance.getTexture((T) entity);
+        return instance.getTextureLocation((T) entity);
     }
 }

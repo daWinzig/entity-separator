@@ -2,12 +2,11 @@ package net.dawinzig.entityseparator.config;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.argument.NbtPathArgumentType;
-import net.minecraft.entity.EntityType;
+import net.minecraft.commands.arguments.NbtPathArgument;
 import net.minecraft.nbt.*;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
@@ -18,10 +17,10 @@ import java.util.regex.Pattern;
 public class Rule {
     private String name = "New Rule";
     private final HashSet<EntityType<?>> entityTypes = new HashSet<>();
-    private NbtPathArgumentType.NbtPath path = null;
+    private NbtPathArgument.NbtPath path = null;
     private boolean inverted = false;
     private boolean compareMode = false;
-    private final HashSet<NbtElement> compare = new HashSet<>();
+    private final HashSet<Tag> compare = new HashSet<>();
     private int maxDistance = 32;
     private String labelPattern = "&6Entity matched!";
     private String texture = "";
@@ -30,17 +29,17 @@ public class Rule {
         this.entityTypes.add(EntityType.GOAT);
         this.setPath("");
     }
-    public Rule(NbtCompound nbtCompound) throws IllegalArgumentException {
+    public Rule(CompoundTag nbtCompound) throws IllegalArgumentException {
         this.name = nbtCompound.getString("name");
-        nbtCompound.getList("entity_types", NbtElement.STRING_TYPE).forEach(id -> {
-            Optional<EntityType<?>> entityType = EntityType.get((id.asString()));
+        nbtCompound.getList("entity_types", Tag.TAG_STRING).forEach(id -> {
+            Optional<EntityType<?>> entityType = EntityType.byString((id.getAsString()));
             entityType.ifPresent(this.entityTypes::add);
         });
         this.setPath(nbtCompound.getString("path"));
         this.maxDistance = nbtCompound.getInt("distance");
         this.labelPattern = nbtCompound.getString("pattern");
         if (nbtCompound.contains("compare")) {
-            this.compare.addAll(((NbtList) Objects.requireNonNull(nbtCompound.get("compare"))));
+            this.compare.addAll(((ListTag) Objects.requireNonNull(nbtCompound.get("compare"))));
             this.compareMode = true;
         }
         this.inverted = nbtCompound.getBoolean("inverted");
@@ -51,18 +50,18 @@ public class Rule {
             throw new IllegalArgumentException();
     }
 
-    public NbtCompound asNbt() {
-        NbtCompound nbtCompound = new NbtCompound();
+    public CompoundTag asNbt() {
+        CompoundTag nbtCompound = new CompoundTag();
 
         nbtCompound.putString("name", this.name);
-        NbtList entityTypes = new NbtList();
-        this.entityTypes.forEach(entityType -> entityTypes.add(NbtString.of(EntityType.getId(entityType).toString())));
+        ListTag entityTypes = new ListTag();
+        this.entityTypes.forEach(entityType -> entityTypes.add(StringTag.valueOf(EntityType.getKey(entityType).toString())));
         nbtCompound.put("entity_types", entityTypes);
         nbtCompound.putString("path", this.getPath());
         nbtCompound.putInt("distance", this.maxDistance);
         nbtCompound.putString("pattern", this.labelPattern);
         if (this.isCompareMode()) {
-            NbtList nbtList = new NbtList();
+            ListTag nbtList = new ListTag();
             nbtList.addAll(this.compare);
             nbtCompound.put("compare", nbtList);
         }
@@ -73,19 +72,19 @@ public class Rule {
         return nbtCompound;
     }
 
-    public boolean shouldAddNameTag(NbtCompound nbt, double d) {
+    public boolean shouldAddNameTag(CompoundTag nbt, double d) {
         if (d <= this.maxDistance * this.maxDistance) {
             return this.matchNbt(nbt);
         }
         return false;
     }
-    public boolean matchNbt(NbtCompound nbt) {
-        NbtElement value;
+    public boolean matchNbt(CompoundTag nbt) {
+        Tag value;
         boolean result = false;
         try {
             value = path.get(nbt).get(0);
             if (this.compareMode) {
-                for (NbtElement element : this.compare) {
+                for (Tag element : this.compare) {
                     if (value.equals(element)) {
                         result = true;
                         break;
@@ -115,7 +114,7 @@ public class Rule {
         String[] arr = new String[this.entityTypes.size()];
         Iterator<EntityType<?>> itt = this.entityTypes.iterator();
         for (int i = 0; i < this.entityTypes.size(); i++) {
-            arr[i] = EntityType.getId(itt.next()).toString();
+            arr[i] = EntityType.getKey(itt.next()).toString();
         }
         return String.join("; ", arr);
     }
@@ -124,9 +123,9 @@ public class Rule {
 
         String[] arr = entityTypes.split(";");
         for (String s : arr) {
-            Identifier identifier = Identifier.tryParse(s.trim());
+            ResourceLocation identifier = ResourceLocation.tryParse(s.trim());
             if (identifier != null) {
-                Optional<EntityType<?>> entityType = EntityType.get(identifier.toString());
+                Optional<EntityType<?>> entityType = EntityType.byString(identifier.toString());
                 entityType.ifPresent(this.entityTypes::add);
             }
         }
@@ -134,9 +133,9 @@ public class Rule {
     public static boolean isValidEntityTypes(String entityTypes) {
         String[] arr = entityTypes.split(";");
         for (String s : arr) {
-            Identifier identifier = Identifier.tryParse(s.trim());
+            ResourceLocation identifier = ResourceLocation.tryParse(s.trim());
             if (identifier != null) {
-                Optional<EntityType<?>> entityType = EntityType.get(identifier.toString());
+                Optional<EntityType<?>> entityType = EntityType.byString(identifier.toString());
                 if (entityType.isEmpty())
                     return false;
             }
@@ -156,12 +155,12 @@ public class Rule {
     }
     public void setPath(String path) {
         try {
-            this.path = new NbtPathArgumentType().parse(new StringReader(path));
+            this.path = new NbtPathArgument().parse(new StringReader(path));
         } catch (CommandSyntaxException|StringIndexOutOfBoundsException ignored) {}
     }
     public static boolean isValidPath(String path) {
         try {
-            new NbtPathArgumentType().parse(new StringReader(path));
+            new NbtPathArgument().parse(new StringReader(path));
         } catch (CommandSyntaxException|StringIndexOutOfBoundsException ignored) {
             return false;
         }
@@ -175,8 +174,8 @@ public class Rule {
         if (this.compare.isEmpty()) return "";
         String[] compares = new String[this.compare.size()];
         int i = 0;
-        for (NbtElement nbtElement : this.compare) {
-            compares[i] = NbtHelper.toFormattedString(nbtElement, true);
+        for (Tag nbtElement : this.compare) {
+            compares[i] = NbtUtils.prettyPrint(nbtElement, true);
             i++;
         }
         return String.join("; ", compares);
@@ -189,10 +188,10 @@ public class Rule {
         }
         this.compare.clear();
         String[] compares = comparesString.split(";");
-        NbtCompound nbtCompound;
+        CompoundTag nbtCompound;
         for (String compare : compares) {
             try {
-                nbtCompound = NbtHelper.fromNbtProviderString("{\"root\":" + compare + "}");
+                nbtCompound = NbtUtils.snbtToStructure("{\"root\":" + compare + "}");
             } catch (CommandSyntaxException ignored) {
                 continue;
             }
@@ -205,7 +204,7 @@ public class Rule {
         String[] compares = comparesString.split(";");
         for (String compare : compares) {
             try {
-                NbtHelper.fromNbtProviderString("{\"root\":" + compare + "}");
+                NbtUtils.snbtToStructure("{\"root\":" + compare + "}");
             } catch (CommandSyntaxException ignored) {
                 return false;
             }
@@ -220,19 +219,19 @@ public class Rule {
         this.maxDistance = maxDistance;
     }
 
-    public Text getLabel(NbtCompound nbt) {
+    public Component getLabel(CompoundTag nbt) {
         String labelText = this.labelPattern;
 
         Matcher placeholder = Pattern.compile("\\{([^{]*)}").matcher(labelText);
         while (placeholder.find()) {
             String replacement = "&c[Error]&r";
             try {
-                replacement = new NbtPathArgumentType().parse(new StringReader(placeholder.group(1))).get(nbt).get(0).asString();
+                replacement = new NbtPathArgument().parse(new StringReader(placeholder.group(1))).get(nbt).get(0).getAsString();
             } catch (CommandSyntaxException|StringIndexOutOfBoundsException ignored) {}
             labelText = labelText.replaceAll("\\{" + placeholder.group(1) + "}", replacement);
         }
 
-        return Text.literal(labelText.replace('&', '§'));
+        return Component.literal(labelText.replace('&', '§'));
     }
     public String getLabelPattern() {
         return labelPattern;

@@ -2,12 +2,11 @@ package net.dawinzig.entityseparator.gui.screens;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.Text;
-
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -15,52 +14,52 @@ import java.util.function.Consumer;
 public class ConfirmScreen extends Screen {
     private final Screen parent;
     private final Consumer<Choice> SELECTION_CALLBACK;
-    private final ButtonWidget doneButton;
-    private final ButtonWidget acceptButton;
-    private final ButtonWidget declineButton;
+    private final Button doneButton;
+    private final Button acceptButton;
+    private final Button declineButton;
 
-    public ConfirmScreen(Screen parent, Text title, Consumer<Choice> selectionCallback) {
+    public ConfirmScreen(Screen parent, Component title, Consumer<Choice> selectionCallback) {
         super(title);
         this.SELECTION_CALLBACK = selectionCallback;
         this.parent = parent;
 
-        this.acceptButton = ButtonWidget.builder(ScreenTexts.YES, (button) -> {
-            this.close();
+        this.acceptButton = Button.builder(CommonComponents.GUI_YES, (button) -> {
+            this.onClose();
                     this.SELECTION_CALLBACK.accept(Choice.YES);
                 }
         ).width(210).build();
-        this.declineButton = ButtonWidget.builder(ScreenTexts.NO, (button) -> {
-            this.close();
+        this.declineButton = Button.builder(CommonComponents.GUI_NO, (button) -> {
+            this.onClose();
                     this.SELECTION_CALLBACK.accept(Choice.NO);
                 }
         ).width(210).build();
-        this.doneButton = ButtonWidget.builder(ScreenTexts.CANCEL, (button) -> this.close()).build();
+        this.doneButton = Button.builder(CommonComponents.GUI_CANCEL, (button) -> this.onClose()).build();
     }
 
     @Override
     protected void init() {
         this.acceptButton.setX(this.width / 2 - this.acceptButton.getWidth() / 2);
         this.acceptButton.setY(50);
-        this.addDrawableChild(this.acceptButton);
+        this.addRenderableWidget(this.acceptButton);
 
         this.declineButton.setX(this.width / 2 - this.declineButton.getWidth() / 2);
         this.declineButton.setY(78);
-        this.addDrawableChild(this.declineButton);
+        this.addRenderableWidget(this.declineButton);
 
         this.doneButton.setX(this.width / 2 - this.doneButton.getWidth() / 2);
         this.doneButton.setY(this.height - 29);
-        this.addDrawableChild(this.doneButton);
+        this.addRenderableWidget(this.doneButton);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 14, 16777215);
+        context.drawCenteredString(this.font, this.title, this.width / 2, 14, 16777215);
     }
 
         @Override
-    public void close() {
-        Objects.requireNonNull(client).setScreen(this.parent);
+    public void onClose() {
+        Objects.requireNonNull(minecraft).setScreen(this.parent);
     }
 
     public enum Choice {

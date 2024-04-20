@@ -4,63 +4,66 @@ import com.google.common.collect.ImmutableList;
 import net.dawinzig.entityseparator.Resources;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.*;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
+public class ListWidget extends ContainerObjectSelectionList<ListWidget.Entry<?>> {
     final Screen parent;
 
-    public ListWidget(Screen parent, MinecraftClient client) {
+    public ListWidget(Screen parent, Minecraft client) {
         super(client, parent.width - 16, parent.height - 72, 32, 21);
         this.setX(8);
         this.parent = parent;
     }
 
-    public void addEntry(Text entryName, Text tooltipText, Boolean initialValue, Boolean defaultValue,
-                         FunctionEnable functionEnable, Identifier functionIcon, Text functionTooltip,
-                         Text functionNarration, Consumer<Entry<Boolean>> functionConsumer,
+    public void addEntry(Component entryName, Component tooltipText, Boolean initialValue, Boolean defaultValue,
+                         FunctionEnable functionEnable, ResourceLocation functionIcon, Component functionTooltip,
+                         Component functionNarration, Consumer<Entry<Boolean>> functionConsumer,
                          Consumer<Entry<Boolean>> saveConsumer, Consumer<Entry<Boolean>> changeConsumer) {
         super.addEntry(new BooleanEntry(entryName, tooltipText, initialValue, defaultValue, functionEnable,
                 functionIcon, functionTooltip, functionNarration, functionConsumer, saveConsumer, changeConsumer));
     }
 
-    public void addEntry(Text entryName, Text tooltipText, int initialValue, int defaultValue, int min, int max,
-                         FunctionEnable functionEnable, Identifier functionIcon, Text functionTooltip,
-                         Text functionNarration, Consumer<Entry<Integer>> functionConsumer,
+    public void addEntry(Component entryName, Component tooltipText, int initialValue, int defaultValue, int min, int max,
+                         FunctionEnable functionEnable, ResourceLocation functionIcon, Component functionTooltip,
+                         Component functionNarration, Consumer<Entry<Integer>> functionConsumer,
                          Consumer<Entry<Integer>> saveConsumer, Consumer<Entry<Integer>> changeConsumer) {
         super.addEntry(new IntEntry(entryName, tooltipText, initialValue, defaultValue, min, max, functionEnable,
                 functionIcon, functionTooltip, functionNarration, functionConsumer, saveConsumer, changeConsumer));
     }
 
-    public void addEntry(Text entryName, Text tooltipText, String initialValue, String defaultValue,
-                         FunctionEnable functionEnable, Identifier functionIcon, Text functionTooltip,
-                         Text functionNarration, Consumer<Entry<String>> functionConsumer,
+    public void addEntry(Component entryName, Component tooltipText, String initialValue, String defaultValue,
+                         FunctionEnable functionEnable, ResourceLocation functionIcon, Component functionTooltip,
+                         Component functionNarration, Consumer<Entry<String>> functionConsumer,
                          Consumer<Entry<String>> saveConsumer, Consumer<Entry<String>> changeConsumer) {
         super.addEntry(new StringEntry(entryName, tooltipText, initialValue, defaultValue, functionEnable,
                 functionIcon, functionTooltip, functionNarration, functionConsumer, saveConsumer, changeConsumer));
     }
 
-    public void addEntry(Text entryName, Text tooltipText, FunctionEnable functionEnable, Identifier identifier,
-                         Text functionTooltip, Text functionNarration, Consumer<Entry<Boolean>> functionConsumer) {
+    public void addEntry(Component entryName, Component tooltipText, FunctionEnable functionEnable, ResourceLocation identifier,
+                         Component functionTooltip, Component functionNarration, Consumer<Entry<Boolean>> functionConsumer) {
         super.addEntry(new PlainEntry(entryName, tooltipText, functionEnable, identifier, functionTooltip,
                 functionNarration, functionConsumer));
     }
 
-    public void addHeader(Text title, Text tooltipText) {
+    public void addHeader(Component title, Component tooltipText) {
         super.addEntry(new CategoryEntry(title, tooltipText));
     }
 
@@ -86,12 +89,12 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
     }
 
     @Override
-    protected int getScrollbarX() {
+    protected int getScrollbarPosition() {
         return parent.width - 9;
     }
 
     public void update() {
-        this.setDimensions(parent.width - 16, parent.height - 72);
+        this.setSize(parent.width - 16, parent.height - 72);
         this.setX(8);
         if (this.getScrollAmount() > this.getMaxScroll()) this.setScrollAmount(this.getMaxScroll());
     }
@@ -101,21 +104,21 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
     }
 
     @Environment(EnvType.CLIENT)
-    public class StringEntry extends ListWidget.Entry<String> {
-        private final TextFieldWidget textField;
+    public class StringEntry extends Entry<String> {
+        private final EditBox textField;
 
-        StringEntry(Text entryName, Text tooltipText, String initialValue, String defaultValue,
-                    FunctionEnable functionEnable, Identifier functionIcon, Text functionTooltip,
-                    Text functionNarration, Consumer<Entry<String>> functionConsumer,
+        StringEntry(Component entryName, Component tooltipText, String initialValue, String defaultValue,
+                    FunctionEnable functionEnable, ResourceLocation functionIcon, Component functionTooltip,
+                    Component functionNarration, Consumer<Entry<String>> functionConsumer,
                     Consumer<Entry<String>> saveConsumer, Consumer<Entry<String>> changeConsumer) {
             super(ListWidget.this, entryName, tooltipText, initialValue, defaultValue, functionEnable, functionIcon,
                     functionTooltip, functionNarration, functionConsumer, saveConsumer, changeConsumer);
 
-            this.textField = new TextFieldWidget(ListWidget.this.client.textRenderer, 0, 0, this.mainWidth - 2, 18, entryName);
+            this.textField = new EditBox(ListWidget.this.minecraft.font, 0, 0, this.mainWidth - 2, 18, entryName);
             this.textField.setMaxLength(Integer.MAX_VALUE);
-            this.textField.setText(value);
-            this.textField.setCursorToStart(false);
-            this.textField.setChangedListener(s -> {
+            this.textField.setValue(value);
+            this.textField.moveCursorToStart(false);
+            this.textField.setResponder(s -> {
                 this.value = s;
                 this.update(false);
             });
@@ -124,7 +127,7 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
         }
 
         @Override
-        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             super.render(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
 
             this.textField.setX(ListWidget.this.getRowRight() - 23 - this.mainWidth + 1);
@@ -132,10 +135,10 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             this.textField.render(context, mouseX, mouseY, tickDelta);
         }
 
-        public List<? extends Element> children() {
+        public List<? extends GuiEventListener> children() {
             return ImmutableList.of(this.textField, this.functionButton);
         }
-        public List<? extends Selectable> selectableChildren() {
+        public List<? extends NarratableEntry> narratables() {
             return ImmutableList.of(this.textField, this.functionButton);
         }
 
@@ -145,19 +148,19 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
         }
         private  void update(boolean includeTextField) {
             if (includeTextField)
-                this.textField.setText(this.value);
+                this.textField.setValue(this.value);
 
             super.update();
         }
     }
 
     @Environment(EnvType.CLIENT)
-    public class IntEntry extends ListWidget.Entry<Integer> {
+    public class IntEntry extends Entry<Integer> {
         private final IntSlider slider;
 
-        IntEntry(Text entryName, Text tooltipText, int initialValue, int defaultValue, int min, int max,
-                 FunctionEnable functionEnable, Identifier functionIcon, Text functionTooltip,
-                 Text functionNarration, Consumer<Entry<Integer>> functionConsumer,
+        IntEntry(Component entryName, Component tooltipText, int initialValue, int defaultValue, int min, int max,
+                 FunctionEnable functionEnable, ResourceLocation functionIcon, Component functionTooltip,
+                 Component functionNarration, Consumer<Entry<Integer>> functionConsumer,
                  Consumer<Entry<Integer>> saveConsumer, Consumer<Entry<Integer>> changeConsumer) {
             super(ListWidget.this, entryName, tooltipText, initialValue, defaultValue, functionEnable, functionIcon,
                     functionTooltip, functionNarration, functionConsumer, saveConsumer, changeConsumer);
@@ -168,7 +171,7 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
         }
 
         @Override
-        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             super.render(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
 
             this.slider.setX(ListWidget.this.getRowRight() - 23 - this.mainWidth);
@@ -176,10 +179,10 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             this.slider.render(context, mouseX, mouseY, tickDelta);
         }
 
-        public List<? extends Element> children() {
+        public List<? extends GuiEventListener> children() {
             return ImmutableList.of(this.slider, this.functionButton);
         }
-        public List<? extends Selectable> selectableChildren() {
+        public List<? extends NarratableEntry> narratables() {
             return ImmutableList.of(this.slider, this.functionButton);
         }
 
@@ -190,12 +193,12 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             super.update();
         }
 
-        protected class IntSlider extends SliderWidget {
+        protected class IntSlider extends AbstractSliderButton {
             private final int min;
             private final int max;
 
             public IntSlider(int x, int y, int width, int height, int value, int min, int max) {
-                super(x, y, width, height, Text.empty(), min);
+                super(x, y, width, height, Component.empty(), min);
 
                 this.min = min;
                 this.max = max;
@@ -205,7 +208,7 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
 
             @Override
             protected void updateMessage() {
-                this.setMessage(Text.of(String.valueOf(IntEntry.this.getValue())));
+                this.setMessage(Component.nullToEmpty(String.valueOf(IntEntry.this.getValue())));
             }
 
             @Override
@@ -220,29 +223,29 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             }
 
             @Override
-            protected MutableText getNarrationMessage() {
-                return MutableText.of(Resources.Translation.insert(Resources.Translation.SLIDER_NARRATOR,
-                        IntEntry.this.entryName, this.getMessage()).getContent());
+            protected MutableComponent createNarrationMessage() {
+                return MutableComponent.create(Resources.Translation.insert(Resources.Translation.SLIDER_NARRATOR,
+                        IntEntry.this.entryName, this.getMessage()).getContents());
             }
         }
     }
 
     @Environment(EnvType.CLIENT)
-    public class BooleanEntry extends ListWidget.Entry<Boolean> {
-        private final ButtonWidget toggleButton;
-        private MutableText toggleNarration;
+    public class BooleanEntry extends Entry<Boolean> {
+        private final Button toggleButton;
+        private MutableComponent toggleNarration;
 
-        BooleanEntry(Text entryName, Text tooltipText, boolean initialValue, boolean defaultValue,
-                     FunctionEnable functionEnable, Identifier functionIcon, Text functionTooltip,
-                     Text functionNarration, Consumer<Entry<Boolean>> functionConsumer,
+        BooleanEntry(Component entryName, Component tooltipText, boolean initialValue, boolean defaultValue,
+                     FunctionEnable functionEnable, ResourceLocation functionIcon, Component functionTooltip,
+                     Component functionNarration, Consumer<Entry<Boolean>> functionConsumer,
                      Consumer<Entry<Boolean>> saveConsumer, Consumer<Entry<Boolean>> changeConsumer) {
             super(ListWidget.this, entryName, tooltipText, initialValue, defaultValue, functionEnable, functionIcon,
                     functionTooltip, functionNarration, functionConsumer, saveConsumer, changeConsumer);
 
-            this.toggleButton = ButtonWidget.builder(this.entryName, button -> {
+            this.toggleButton = Button.builder(this.entryName, button -> {
                 this.value = !this.value;
                 this.update();
-            }).dimensions(0, 0, this.mainWidth, 20).narrationSupplier(
+            }).bounds(0, 0, this.mainWidth, 20).createNarration(
                     textSupplier -> toggleNarration
             ).build();
 
@@ -250,7 +253,7 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
         }
 
         @Override
-        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             super.render(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
 
             this.toggleButton.setX(ListWidget.this.getRowRight() - 23 - this.mainWidth);
@@ -258,71 +261,71 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             this.toggleButton.render(context, mouseX, mouseY, tickDelta);
         }
 
-        public List<? extends Element> children() {
+        public List<? extends GuiEventListener> children() {
             return ImmutableList.of(this.toggleButton, this.functionButton);
         }
 
-        public List<? extends Selectable> selectableChildren() {
+        public List<? extends NarratableEntry> narratables() {
             return ImmutableList.of(this.toggleButton, this.functionButton);
         }
 
         @Override
         protected void update() {
             if (this.value)
-                this.toggleButton.setMessage(((MutableText) ScreenTexts.ON).formatted(Formatting.GREEN));
+                this.toggleButton.setMessage(((MutableComponent) CommonComponents.OPTION_ON).withStyle(ChatFormatting.GREEN));
             else
-                this.toggleButton.setMessage(((MutableText) ScreenTexts.OFF).formatted(Formatting.RED));
+                this.toggleButton.setMessage(((MutableComponent) CommonComponents.OPTION_OFF).withStyle(ChatFormatting.RED));
 
-            this.toggleNarration = MutableText.of(Resources.Translation.insert(Resources.Translation.TOGGLE_NARRATOR,
-                    this.entryName, this.toggleButton.getMessage()).getContent());
+            this.toggleNarration = MutableComponent.create(Resources.Translation.insert(Resources.Translation.TOGGLE_NARRATOR,
+                    this.entryName, this.toggleButton.getMessage()).getContents());
 
             super.update();
         }
     }
 
     @Environment(EnvType.CLIENT)
-    public class PlainEntry extends ListWidget.Entry<Boolean> {
-        PlainEntry(Text entryName, Text tooltipText, FunctionEnable functionEnable, Identifier functionIcon,
-                   Text functionTooltip, Text functionNarration, Consumer<Entry<Boolean>> functionConsumer) {
+    public class PlainEntry extends Entry<Boolean> {
+        PlainEntry(Component entryName, Component tooltipText, FunctionEnable functionEnable, ResourceLocation functionIcon,
+                   Component functionTooltip, Component functionNarration, Consumer<Entry<Boolean>> functionConsumer) {
             super(ListWidget.this, entryName, tooltipText, true, true, functionEnable, functionIcon,
                     functionTooltip, functionNarration, functionConsumer, entry -> {}, entry -> {});
 
             this.update();
         }
 
-        public List<? extends Element> children() {
+        public List<? extends GuiEventListener> children() {
             return ImmutableList.of(this.functionButton);
         }
 
-        public List<? extends Selectable> selectableChildren() {
+        public List<? extends NarratableEntry> narratables() {
             return ImmutableList.of(this.functionButton);
         }
     }
 
     @Environment(EnvType.CLIENT)
-    public class CategoryEntry extends ListWidget.Entry<Boolean> {
-        CategoryEntry(Text entryName, Text tooltipText) {
+    public class CategoryEntry extends Entry<Boolean> {
+        CategoryEntry(Component entryName, Component tooltipText) {
             super(ListWidget.this, entryName, tooltipText, true, true, cat -> {}, cat -> {});
         }
 
-        public List<? extends Element> children() {
+        public List<? extends GuiEventListener> children() {
             return ImmutableList.of();
         }
-        public List<? extends Selectable> selectableChildren() {
+        public List<? extends NarratableEntry> narratables() {
             return ImmutableList.of();
         }
 
         @Override
-        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight,
+        public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float tickDelta) {
             super.render(context, index, y, x, entryWidth, entryHeight, mouseX, mouseY, hovered, tickDelta);
 
-            context.drawHorizontalLine(x+3, x+entryWidth/2-this.label.getWidth()/2-6, y+entryHeight/2+1, ColorHelper.Argb.getArgb(255,128,128,128));
-            context.drawHorizontalLine(x+entryWidth/2+this.label.getWidth()/2+6, x+entryWidth-3, y+entryHeight/2+1, ColorHelper.Argb.getArgb(255,128,128,128));
+            context.hLine(x+3, x+entryWidth/2-this.label.getWidth()/2-6, y+entryHeight/2+1, FastColor.ARGB32.color(255,128,128,128));
+            context.hLine(x+entryWidth/2+this.label.getWidth()/2+6, x+entryWidth-3, y+entryHeight/2+1, FastColor.ARGB32.color(255,128,128,128));
         }
 
         @Override
-        protected void highlight(DrawContext context, int y, int x, int entryWidth, int entryHeight, int color) {}
+        protected void highlight(GuiGraphics context, int y, int x, int entryWidth, int entryHeight, int color) {}
     }
 
     public enum FunctionEnable {
@@ -330,16 +333,16 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
     }
 
     @Environment(EnvType.CLIENT)
-    public abstract static class Entry<T> extends ElementListWidget.Entry<Entry<?>> {
+    public abstract static class Entry<T> extends ContainerObjectSelectionList.Entry<Entry<?>> {
         final int mainWidth = 200;
 
         private final ListWidget parent;
-        final TextWidget label;
-        final Text entryName;
+        final StringWidget label;
+        final Component entryName;
         final T initialValue;
         final T defaultValue;
-        final ButtonWidget functionButton;
-        final Text functionTooltip;
+        final Button functionButton;
+        final Component functionTooltip;
         final FunctionEnable functionEnable;
         final Consumer<Entry<T>> saveConsumer;
         final Consumer<Entry<T>> changeConsumer;
@@ -347,8 +350,8 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
         private boolean valid = true;
         T value;
 
-        protected Entry(ListWidget parent, Text entryName, Text tooltipText, T initialValue, T defaultValue,
-                        FunctionEnable functionEnable, Identifier functionIcon, Text functionTooltip, Text functionNarration,
+        protected Entry(ListWidget parent, Component entryName, Component tooltipText, T initialValue, T defaultValue,
+                        FunctionEnable functionEnable, ResourceLocation functionIcon, Component functionTooltip, Component functionNarration,
                         Consumer<Entry<T>> functionConsumer, Consumer<Entry<T>> saveConsumer, Consumer<Entry<T>> changeConsumer) {
             this.parent = parent;
             this.entryName = entryName;
@@ -360,18 +363,18 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             this.changeConsumer = changeConsumer;
             this.value = initialValue;
 
-            this.label = new TextWidget(entryName, parent.client.textRenderer);
-            label.setTooltip(Tooltip.of(tooltipText != null ? tooltipText : Text.of("")));
+            this.label = new StringWidget(entryName, parent.minecraft.font);
+            label.setTooltip(Tooltip.create(tooltipText != null ? tooltipText : Component.nullToEmpty("")));
 
             this.functionButton = new IconButtonWidget(20, 20, functionIcon, 16, 16,
                     button -> functionConsumer.accept(this), entryName.copy().append(" ").append(functionNarration));
 
             if (this.functionEnable == FunctionEnable.ENABLED)
-                this.functionButton.setTooltip(Tooltip.of(this.functionTooltip, Text.of("")));
+                this.functionButton.setTooltip(Tooltip.create(this.functionTooltip, Component.nullToEmpty("")));
             else if (this.functionEnable == FunctionEnable.DISABLED)
                 this.functionButton.active = false;
         }
-        protected Entry(ListWidget parent, Text entryName, Text tooltipText, T initialValue, T defaultValue,
+        protected Entry(ListWidget parent, Component entryName, Component tooltipText, T initialValue, T defaultValue,
                         Consumer<Entry<T>> saveConsumer, Consumer<Entry<T>> changeConsumer) {
             this.parent = parent;
             this.entryName = entryName;
@@ -383,8 +386,8 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             this.changeConsumer = changeConsumer;
             this.value = initialValue;
 
-            this.label = new TextWidget(entryName, parent.client.textRenderer);
-            this.label.setTooltip(tooltipText != null ? Tooltip.of(tooltipText) : null);
+            this.label = new StringWidget(entryName, parent.minecraft.font);
+            this.label.setTooltip(tooltipText != null ? Tooltip.create(tooltipText) : null);
 
             this.functionButton = null;
         }
@@ -413,20 +416,20 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
         protected void update() {
             if (this.functionButton != null && this.functionEnable == FunctionEnable.ON_CHANGED) {
                 this.functionButton.active = !this.isDefault();
-                this.functionButton.setTooltip(Tooltip.of(isDefault() ? Text.of("") : this.functionTooltip, Text.of("")));
+                this.functionButton.setTooltip(Tooltip.create(isDefault() ? Component.nullToEmpty("") : this.functionTooltip, Component.nullToEmpty("")));
             }
 
             this.changeConsumer.accept(this);
         }
 
-        protected void highlight(DrawContext context, int y, int x, int entryWidth, int entryHeight, int color) {
-            context.drawBorder(x - 1, y - 1, entryWidth + 2, entryHeight + 5, color);
+        protected void highlight(GuiGraphics context, int y, int x, int entryWidth, int entryHeight, int color) {
+            context.renderOutline(x - 1, y - 1, entryWidth + 2, entryHeight + 5, color);
         }
 
         public void setValid(boolean valid) { this.valid = valid; }
         public boolean isValid() { return this.valid; }
 
-        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight,
+        public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight,
                            int mouseX, int mouseY, boolean hovered, float tickDelta) {
             if (this.isMouseOver(mouseX, mouseY))
                 this.highlight(context, y, x, entryWidth, entryHeight, -12303292);
@@ -437,16 +440,16 @@ public class ListWidget extends ElementListWidget<ListWidget.Entry<?>> {
             this.label.setX(labelX);
             this.label.setY(y + entryHeight/2 - 2);
 
-            if (label.getTooltip() != null && !label.getTooltip().getLines(parent.client).isEmpty())
-                context.drawHorizontalLine(
+            if (label.getTooltip() != null && !label.getTooltip().toCharSequence(parent.minecraft).isEmpty())
+                context.hLine(
                         labelX, labelX+this.label.getWidth(), y+entryHeight/2+7,
-                        ColorHelper.Argb.getArgb(70, 255,255,255));
+                        FastColor.ARGB32.color(70, 255,255,255));
 
             if (!this.valid) {
-                this.label.setTextColor(-65530);
+                this.label.setColor(-65530);
                 this.highlight(context, y, x, entryWidth, entryHeight, -65530);
             }
-            else this.label.setTextColor(-1);
+            else this.label.setColor(-1);
 
             this.label.render(context, mouseX, mouseY, tickDelta);
 
