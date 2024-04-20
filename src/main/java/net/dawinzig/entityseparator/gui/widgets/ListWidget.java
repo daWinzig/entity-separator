@@ -30,8 +30,7 @@ public class ListWidget extends ContainerObjectSelectionList<ListWidget.Entry<?>
     final Screen parent;
 
     public ListWidget(Screen parent, Minecraft client) {
-        super(client, parent.width - 16, parent.height - 72, 32, 21);
-        this.setX(8);
+        super(client, parent.width, parent.height - 72, 32, 21);
         this.parent = parent;
     }
 
@@ -86,8 +85,13 @@ public class ListWidget extends ContainerObjectSelectionList<ListWidget.Entry<?>
     }
 
     @Override
+    public int getRowLeft() {
+        return 16;
+    }
+
+    @Override
     public int getMaxScroll() {
-        return Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getX() - 7));
+        return Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getY() - 7));
     }
 
     @Override
@@ -96,8 +100,7 @@ public class ListWidget extends ContainerObjectSelectionList<ListWidget.Entry<?>
     }
 
     public void update() {
-        this.setSize(parent.width - 16, parent.height - 72);
-        this.setX(8);
+        this.setSize(parent.width, parent.height - 72);
         if (this.getScrollAmount() > this.getMaxScroll()) this.setScrollAmount(this.getMaxScroll());
     }
 
