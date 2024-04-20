@@ -7,6 +7,8 @@ import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 public class MessageToast implements Toast {
@@ -26,7 +28,7 @@ public class MessageToast implements Toast {
     }
 
     @Override
-    public Visibility render(GuiGraphics context, ToastComponent manager, long startTime) {
+    public @NotNull Visibility render(GuiGraphics context, ToastComponent manager, long startTime) {
         context.blitSprite(Resources.IDShort.TOAST_BACKGROUND, 0, 0, this.width(), this.height());
         context.vLine(4, 3, this.height()-4, level.color);
         context.drawString(client.font, text, 15, 12, 16777215, false);

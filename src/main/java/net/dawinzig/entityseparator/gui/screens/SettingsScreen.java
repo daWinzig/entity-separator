@@ -50,7 +50,7 @@ public class SettingsScreen extends Screen {
                     Resources.Translation.BUTTON_RESET,
                     Resources.Translation.BUTTON_RESET,
                     entry -> {
-                        entry.setFocused(entry.children().get(0));
+                        entry.setFocused(entry.children().getFirst());
                         entry.reset();
                     },
                     entry -> Config.OPTIONS.getBool(path).setValue(entry.getValue()),
@@ -65,7 +65,7 @@ public class SettingsScreen extends Screen {
                     Resources.Translation.BUTTON_RESET,
                     Resources.Translation.BUTTON_RESET,
                     entry -> {
-                        entry.setFocused(entry.children().get(0));
+                        entry.setFocused(entry.children().getFirst());
                         entry.reset();
                     },
                     entry -> Config.OPTIONS.getStr(path).setValue(entry.getValue()),
@@ -81,7 +81,7 @@ public class SettingsScreen extends Screen {
                     Resources.Translation.BUTTON_RESET,
                     Resources.Translation.BUTTON_RESET,
                     entry -> {
-                        entry.setFocused(entry.children().get(0));
+                        entry.setFocused(entry.children().getFirst());
                         entry.reset();
                     },
                     entry -> Config.OPTIONS.getInt(path).setValue(entry.getValue()),

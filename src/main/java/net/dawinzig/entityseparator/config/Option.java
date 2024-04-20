@@ -59,10 +59,12 @@ public abstract class Option<T> {
             children.put(key, option);
             if (option instanceof Category) ((Category) option).depth = this.depth + 1;
         }
+        @SuppressWarnings("unused") //UNUSED
         public int getDepth() {
             return this.depth;
         }
 
+        @SuppressWarnings("unused") //UNUSED
         public Category getOrCreateCategory(String... key) {
             if (key.length == 0) return this;
             if (!children.containsKey(key[0])) this.addChild(key[0], new Category(null, null));
@@ -73,10 +75,12 @@ public abstract class Option<T> {
             Bool option = getBool(key);
             return option != null ? option.getValue() : defaultValue;
         }
+        @SuppressWarnings("unused") //UNUSED
         public int getValueOrDefault(int defaultValue, String... key) {
             Int option = getInt(key);
             return option != null ? option.getValue() : defaultValue;
         }
+        @SuppressWarnings("unused") //UNUSED
         public String getValueOrDefault(String defaultValue, String... key) {
             Str option = getStr(key);
             return option != null ? option.getValue() : defaultValue;
@@ -129,6 +133,7 @@ public abstract class Option<T> {
         private final int min;
         private final int max;
 
+        @SuppressWarnings("unused") //UNUSED
         Int(@Nullable Component displayName, @Nullable Component tooltip, int value, int defaultValue, int min, int max) {
             super(displayName, tooltip, value, defaultValue);
 
@@ -173,7 +178,8 @@ public abstract class Option<T> {
     }
 
     public static class Str extends Option<String> {
-        Str(@Nullable Component displayName, @Nullable Component tooltip, String value, String defaultValue) {
+        Str(@Nullable Component displayName, @Nullable Component tooltip, String value, String defaultValue) //UNUSED
+        {
             super(displayName, tooltip, value, defaultValue);
         }
 

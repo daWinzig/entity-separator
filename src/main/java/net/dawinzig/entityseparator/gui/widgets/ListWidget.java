@@ -21,6 +21,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -135,10 +137,10 @@ public class ListWidget extends ContainerObjectSelectionList<ListWidget.Entry<?>
             this.textField.render(context, mouseX, mouseY, tickDelta);
         }
 
-        public List<? extends GuiEventListener> children() {
+        public @NotNull List<? extends GuiEventListener> children() {
             return ImmutableList.of(this.textField, this.functionButton);
         }
-        public List<? extends NarratableEntry> narratables() {
+        public @NotNull List<? extends NarratableEntry> narratables() {
             return ImmutableList.of(this.textField, this.functionButton);
         }
 
@@ -179,10 +181,10 @@ public class ListWidget extends ContainerObjectSelectionList<ListWidget.Entry<?>
             this.slider.render(context, mouseX, mouseY, tickDelta);
         }
 
-        public List<? extends GuiEventListener> children() {
+        public @NotNull List<? extends GuiEventListener> children() {
             return ImmutableList.of(this.slider, this.functionButton);
         }
-        public List<? extends NarratableEntry> narratables() {
+        public @NotNull List<? extends NarratableEntry> narratables() {
             return ImmutableList.of(this.slider, this.functionButton);
         }
 
@@ -223,7 +225,7 @@ public class ListWidget extends ContainerObjectSelectionList<ListWidget.Entry<?>
             }
 
             @Override
-            protected MutableComponent createNarrationMessage() {
+            protected @NotNull MutableComponent createNarrationMessage() {
                 return MutableComponent.create(Resources.Translation.insert(Resources.Translation.SLIDER_NARRATOR,
                         IntEntry.this.entryName, this.getMessage()).getContents());
             }
@@ -261,11 +263,11 @@ public class ListWidget extends ContainerObjectSelectionList<ListWidget.Entry<?>
             this.toggleButton.render(context, mouseX, mouseY, tickDelta);
         }
 
-        public List<? extends GuiEventListener> children() {
+        public @NotNull List<? extends GuiEventListener> children() {
             return ImmutableList.of(this.toggleButton, this.functionButton);
         }
 
-        public List<? extends NarratableEntry> narratables() {
+        public @NotNull List<? extends NarratableEntry> narratables() {
             return ImmutableList.of(this.toggleButton, this.functionButton);
         }
 
@@ -293,11 +295,11 @@ public class ListWidget extends ContainerObjectSelectionList<ListWidget.Entry<?>
             this.update();
         }
 
-        public List<? extends GuiEventListener> children() {
+        public @NotNull List<? extends GuiEventListener> children() {
             return ImmutableList.of(this.functionButton);
         }
 
-        public List<? extends NarratableEntry> narratables() {
+        public @NotNull List<? extends NarratableEntry> narratables() {
             return ImmutableList.of(this.functionButton);
         }
     }
@@ -308,10 +310,10 @@ public class ListWidget extends ContainerObjectSelectionList<ListWidget.Entry<?>
             super(ListWidget.this, entryName, tooltipText, true, true, cat -> {}, cat -> {});
         }
 
-        public List<? extends GuiEventListener> children() {
+        public @NotNull List<? extends GuiEventListener> children() {
             return ImmutableList.of();
         }
-        public List<? extends NarratableEntry> narratables() {
+        public @NotNull List<? extends NarratableEntry> narratables() {
             return ImmutableList.of();
         }
 

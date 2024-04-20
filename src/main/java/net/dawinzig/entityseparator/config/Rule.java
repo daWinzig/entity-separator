@@ -82,7 +82,7 @@ public class Rule {
         Tag value;
         boolean result = false;
         try {
-            value = path.get(nbt).get(0);
+            value = path.get(nbt).getFirst();
             if (this.compareMode) {
                 for (Tag element : this.compare) {
                     if (value.equals(element)) {
@@ -226,7 +226,7 @@ public class Rule {
         while (placeholder.find()) {
             String replacement = "&c[Error]&r";
             try {
-                replacement = new NbtPathArgument().parse(new StringReader(placeholder.group(1))).get(nbt).get(0).getAsString();
+                replacement = new NbtPathArgument().parse(new StringReader(placeholder.group(1))).get(nbt).getFirst().getAsString();
             } catch (CommandSyntaxException|StringIndexOutOfBoundsException ignored) {}
             labelText = labelText.replaceAll("\\{" + placeholder.group(1) + "}", replacement);
         }

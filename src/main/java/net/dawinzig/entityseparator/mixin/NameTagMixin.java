@@ -22,7 +22,8 @@ public abstract class NameTagMixin<T extends Entity> {
 	@Shadow protected abstract void renderNameTag(T entity, Component text, PoseStack matrices, MultiBufferSource vertexConsumers, int light, float tickDelta);
 	@Shadow protected abstract boolean shouldShowName(T entity);
 
-	@ModifyVariable(method = "renderNameTag", at = @At("STORE"), ordinal = 0)
+	@SuppressWarnings("InvalidInjectorMethodSignature")
+    @ModifyVariable(method = "renderNameTag", at = @At("STORE"), ordinal = 0)
 	private double d(double x) {
 		return 0.0;
 	}
