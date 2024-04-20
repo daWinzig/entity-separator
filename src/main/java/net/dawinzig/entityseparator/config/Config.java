@@ -161,7 +161,6 @@ public class Config {
         try {
             String fileName = name.toLowerCase(Locale.ROOT).replace(' ', '_');
             fileName = FileUtil.findAvailableName(this.rulesPath.resolve(offset), fileName, Config.ruleFileExtension);
-            fileName = fileName.replace(" ", "");
             return offset.resolve(fileName);
         } catch (IOException e) {
             throw new RuntimeException(e);
