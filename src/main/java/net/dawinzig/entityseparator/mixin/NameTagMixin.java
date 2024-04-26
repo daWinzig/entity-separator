@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,6 +34,13 @@ public abstract class NameTagMixin<T extends Entity> {
 					   MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
 		double d = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition()
 				.distanceToSqr(entity.position());
+
+		// minecraft crashes if you try to read nbt from an arrow with an empty pickupItemStack (stuck in a player)
+		if (entity instanceof AbstractArrow && ((AbstractArrow) entity).getPickupItemStackOrigin().isEmpty()) {
+			ci.cancel();
+			return;
+		}
+
 		CompoundTag nbt = entity.saveWithoutId(new CompoundTag());
 
         List<Component> nameTagText = new ArrayList<>();
