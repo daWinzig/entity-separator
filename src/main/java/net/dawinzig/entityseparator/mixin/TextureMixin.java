@@ -22,7 +22,7 @@ public abstract class TextureMixin<T extends LivingEntity> {
             if (rule.containsEntityType(entity.getType()) && rule.hasTexture()) {
                 CompoundTag nbt = entity.saveWithoutId(new CompoundTag());
                 if (rule.matchNbt(nbt))
-                    return new ResourceLocation(rule.getTexture());
+                    return ResourceLocation.tryParse(rule.getTexture());
             }
         }
         return instance.getTextureLocation((T) entity);

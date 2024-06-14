@@ -71,14 +71,14 @@ public abstract class Resources {
     }
     public abstract static class IDShort {
         // buttons
-        public static final ResourceLocation RESET = new ResourceLocation(Resources.MOD_ID, "reset");
-        public static final ResourceLocation DELETE = new ResourceLocation(Resources.MOD_ID, "delete");
-        public static final ResourceLocation RELOAD = new ResourceLocation(Resources.MOD_ID, "reload");
-        public static final ResourceLocation ADD = new ResourceLocation(Resources.MOD_ID, "add");
-        public static final ResourceLocation OPTIONS = new ResourceLocation(Resources.MOD_ID, "options");
-        public static final ResourceLocation FOLDER = new ResourceLocation(Resources.MOD_ID, "folder");
-        public static final ResourceLocation EDIT = new ResourceLocation(Resources.MOD_ID, "edit");
+        public static final ResourceLocation RESET = ResourceLocation.fromNamespaceAndPath(Resources.MOD_ID, "reset");
+        public static final ResourceLocation DELETE = ResourceLocation.fromNamespaceAndPath(Resources.MOD_ID, "delete");
+        public static final ResourceLocation RELOAD = ResourceLocation.fromNamespaceAndPath(Resources.MOD_ID, "reload");
+        public static final ResourceLocation ADD = ResourceLocation.fromNamespaceAndPath(Resources.MOD_ID, "add");
+        public static final ResourceLocation OPTIONS = ResourceLocation.fromNamespaceAndPath(Resources.MOD_ID, "options");
+        public static final ResourceLocation FOLDER = ResourceLocation.fromNamespaceAndPath(Resources.MOD_ID, "folder");
+        public static final ResourceLocation EDIT = ResourceLocation.fromNamespaceAndPath(Resources.MOD_ID, "edit");
         // toast
-        public static final ResourceLocation TOAST_BACKGROUND = new ResourceLocation("toast/advancement");
+        public static final ResourceLocation TOAST_BACKGROUND = ResourceLocation.withDefaultNamespace("toast/advancement");
     }
 }
