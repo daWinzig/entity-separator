@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -27,23 +26,15 @@ public abstract class NameTagMixin<T extends Entity, S extends EntityRenderState
 	@Shadow protected abstract void renderNameTag(S entityRenderState, Component text, PoseStack poseStack, MultiBufferSource multiBufferSource, int light);
 	@Shadow protected abstract boolean shouldShowName(T entity, double d);
 
-	@SuppressWarnings("InvalidInjectorMethodSignature")
-    @ModifyVariable(method = "renderNameTag", at = @At("STORE"), ordinal = 0)
-	private double d(double x) {
-		return 0.0;
-	}
-
 	@Unique
 	private T currentEntity = null;
-
-	@Inject(at = @At("HEAD"), method = "shouldShowName")
-	private void shouldShowNameX(T entity, double d, CallbackInfoReturnable<Boolean> cir) {
+	@Inject(at = @At("HEAD"), method = "affectedByCulling")
+	private void getNameTag(T entity, CallbackInfoReturnable<Component> cir) {
 		currentEntity = entity;
 	}
 
 	@Inject(at = @At("HEAD"), method = "render", cancellable = true)
 	public void render(S entityRenderState, PoseStack poseStack, MultiBufferSource multiBufferSource, int light, CallbackInfo ci) {
-
 		T entity = currentEntity;
 		if (entity == null) {
 			return;

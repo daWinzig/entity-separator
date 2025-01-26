@@ -1,11 +1,8 @@
 package net.dawinzig.entityseparator.mixin;
 
-import net.dawinzig.entityseparator.EntitySeparator;
 import net.dawinzig.entityseparator.config.Config;
 import net.dawinzig.entityseparator.config.Rule;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.nbt.CompoundTag;
@@ -24,7 +21,6 @@ public abstract class TextureMixin<T extends LivingEntity, S extends LivingEntit
 
     @Unique
     private T currentEntity = null;
-
     @Inject(at = @At("HEAD"), method = "shouldShowName*")
     private void shouldShowNameX(T entity, double d, CallbackInfoReturnable<Boolean> cir) {
         currentEntity = entity;
@@ -32,7 +28,6 @@ public abstract class TextureMixin<T extends LivingEntity, S extends LivingEntit
 
     @Redirect(method = "getRenderType", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;getTextureLocation(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;)Lnet/minecraft/resources/ResourceLocation;"))
     private ResourceLocation getTextureLocation(LivingEntityRenderer<T, S, M> instance, S livingEntityRenderState) {
-        EntitySeparator.LOGGER.info(String.valueOf(currentEntity));
         if (currentEntity != null) {
             for (Rule rule : Config.RULES.values()) {
                 if (rule.containsEntityType(currentEntity.getType()) && rule.hasTexture()) {
