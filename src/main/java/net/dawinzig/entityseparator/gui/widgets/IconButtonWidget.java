@@ -4,6 +4,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -27,7 +28,7 @@ public class IconButtonWidget extends Button implements Renderable, NarratableEn
     @Override
     public void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.renderWidget(context, mouseX, mouseY, delta);
-        context.blitSprite(this.texture, this.getX() + this.offsetX, this.getY() + this.offsetY,
+        context.blitSprite(RenderType::guiTextured, this.texture, this.getX() + this.offsetX, this.getY() + this.offsetY,
                 this.textureWidth, this.textureHeight);
     }
 }

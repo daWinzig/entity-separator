@@ -127,7 +127,7 @@ public class SettingsScreen extends Screen {
         if (this.optionsList.hasChanged()) {
             this.optionsList.save();
             if (!Config.IO.saveConfig())
-                Objects.requireNonNull(this.minecraft).getToasts().addToast(new MessageToast(
+                Objects.requireNonNull(this.minecraft).getToastManager().addToast(new MessageToast(
                         this.minecraft,
                         Resources.Translation.insert(Resources.Translation.TOAST_SAVE_FAILED, "config"),
                         MessageToast.Level.ERROR

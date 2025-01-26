@@ -47,7 +47,7 @@ public class RulesScreen extends Screen {
                     Config.IO.loadAllRules();
                     this.reload();
                     assert this.minecraft != null;
-                    this.minecraft.getToasts().addToast(new MessageToast(
+                    this.minecraft.getToastManager().addToast(new MessageToast(
                             this.minecraft,
                             Resources.Translation.insert(Resources.Translation.TOAST_RELOAD, Resources.Translation.TITLE_RULES),
                             MessageToast.Level.INFO
@@ -219,7 +219,7 @@ public class RulesScreen extends Screen {
             Config.RULES.put(path, Config.RULES.get(path));
             if (!Config.IO.saveRule(path, Config.RULES.get(path))) {
                 success.set(false);
-                Objects.requireNonNull(this.minecraft).getToasts().addToast(new MessageToast(
+                Objects.requireNonNull(this.minecraft).getToastManager().addToast(new MessageToast(
                         this.minecraft,
                         Resources.Translation.insert(Resources.Translation.TOAST_SAVE_FAILED, path),
                         MessageToast.Level.ERROR
@@ -233,7 +233,7 @@ public class RulesScreen extends Screen {
                 if (!Config.IO.saveRule(path, rule)) {
                     success.set(false);
                     Config.SAVE_FAILED.add(path);
-                    Objects.requireNonNull(this.minecraft).getToasts().addToast(new MessageToast(
+                    Objects.requireNonNull(this.minecraft).getToastManager().addToast(new MessageToast(
                             this.minecraft,
                             Resources.Translation.insert(Resources.Translation.TOAST_SAVE_FAILED, path),
                             MessageToast.Level.ERROR
@@ -251,7 +251,7 @@ public class RulesScreen extends Screen {
             if (!Config.IO.saveRule(path, rule)) {
                 success.set(false);
                 Config.SAVE_FAILED.add(path);
-                Objects.requireNonNull(this.minecraft).getToasts().addToast(new MessageToast(
+                Objects.requireNonNull(this.minecraft).getToastManager().addToast(new MessageToast(
                         this.minecraft,
                         Resources.Translation.insert(Resources.Translation.TOAST_SAVE_FAILED, path),
                         MessageToast.Level.ERROR
