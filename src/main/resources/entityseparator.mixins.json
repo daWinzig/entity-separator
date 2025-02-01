@@ -6,7 +6,8 @@
   "mixins": [
   ],
   "client": [
-    "NameTagMixin",
+    "EntityRendererDispatcherMixin",
+    "EntityRendererInvoker",
     "TextureMixin"
   ],
   "injectors": {
