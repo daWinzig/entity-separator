@@ -228,7 +228,7 @@ public class Rule {
             try {
                 replacement = new NbtPathArgument().parse(new StringReader(placeholder.group(1))).get(nbt).getFirst().getAsString();
             } catch (CommandSyntaxException|StringIndexOutOfBoundsException ignored) {}
-            labelText = labelText.replaceAll("\\{" + placeholder.group(1) + "}", replacement);
+            labelText = labelText.replace("{" + placeholder.group(1) + "}", replacement);
         }
 
         return Component.literal(labelText.replace('&', '§'));
