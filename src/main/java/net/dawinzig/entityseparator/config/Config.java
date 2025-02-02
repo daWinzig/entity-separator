@@ -99,11 +99,21 @@ public class Config {
         this.saveConfig();
     }
     private static void generateDefaultConfig() {
-        Config.OPTIONS.addChild("regenerate", new Option.Bool(
-                Resources.Translation.OPTION_REGENERATE, Resources.Translation.OPTION_REGENERATE_TOOLTIP, true, true));
-//        TEMP hidden while none implemented
-//        Config.OPTIONS.addChild("easter_eggs", new Option.Bool(
-//                Resources.Translation.OPTION_EASTER_EGGS, null, true, true));
+        Option.Category generalCategory = new Option.Category(Resources.Translation.OPTION_CATEGORY_GENERAL, null);
+        Config.OPTIONS.addChild("general", generalCategory);
+        generalCategory.addChild("regenerate", new Option.Bool(
+                Resources.Translation.OPTION_GENERAL_REGENERATE, Resources.Translation.OPTION_GENERAL_REGENERATE_TOOLTIP, true, true));
+        Option.Category copyCategory = new Option.Category(Resources.Translation.OPTION_CATEGORY_COPY, Resources.Translation.OPTION_CATEGORY_COPY_TOOLTIP);
+        Config.OPTIONS.addChild("copy", copyCategory);
+        copyCategory.addChild("active", new Option.Bool(
+                Resources.Translation.OPTION_COPY_ACTIVE, null, true, true));
+        copyCategory.addChild("tool", new Option.Str(
+                Resources.Translation.OPTION_COPY_TOOL, Resources.Translation.OPTION_COPY_TOOL_TOOLTIP, "minecraft:diamond", "minecraft:diamond"));
+////        TEMP hidden while none implemented
+//        Option.Category easterEggCategory = new Option.Category(Resources.Translation.OPTION_CATEGORY_EASTEREGG, null);
+//        Config.OPTIONS.addChild("easteregg", easterEggCategory);
+//        easterEggCategory.addChild("active", new Option.Bool(
+//                Resources.Translation.OPTION_EASTEREGG_ACTIVE, null, true, true));
     }
     private static void setOptionsIfPresent(Option.Category category, JsonObject json) {
         category.foreach((key, option) -> {

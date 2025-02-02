@@ -1,9 +1,12 @@
 {
   "entityseparator.category.main": "Entity Separator",
   "entityseparator.key.menu": "Open Menu",
+  "entityseparator.key.tool": "Toggle Tool",
 
   "entityseparator.toast.reload": "%s reloaded!",
   "entityseparator.toast.save.failed": "Failed to save: %s!",
+  "entityseparator.toast.copied": "Copied NBT!",
+  "entityseparator.toast.tool.toggle": "Copy Tool %s!",
 
   "entityseparator.toggle.narrator": "toggle %s is %s",
   "entityseparator.slider.narrator": "slider %s has the value %s",
@@ -43,9 +46,16 @@
   "entityseparator.rules.category.deleted.tooltip": "rules will be deleted on save",
 
   "entityseparator.title.options": "Entity Separator Options",
-  "entityseparator.option.regenerate": "Regenerate Default Rules",
-  "entityseparator.option.regenerate.tooltip": "Regenerate Default Rules on (re-)load if not already present",
-  "entityseparator.option.easter_eggs": "Allow Easter Eggs",
+  "entityseparator.option.category.general": "General",
+  "entityseparator.option.general.regenerate": "Regenerate Default Rules",
+  "entityseparator.option.general.regenerate.tooltip": "Regenerate Default Rules on (re-)load if not already present",
+  "entityseparator.option.category.copy": "NBT Copy",
+  "entityseparator.option.category.copy.tooltip": "Use the tool on an entity top copy their NBT to the clipboard",
+  "entityseparator.option.copy.active": "Tool Active",
+  "entityseparator.option.copy.tool": "Tool-Item",
+  "entityseparator.option.copy.tool.tooltip": "Item used to copy NBT of entity if active",
+  "entityseparator.option.category.easteregg": "Easter Eggs",
+  "entityseparator.option.easteregg.active": "Allow Easter Eggs",
 
   "entityseparator.confirm.save.title": "Save Changes?"
 }

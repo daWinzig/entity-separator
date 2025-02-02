@@ -9,6 +9,8 @@ public abstract class Resources {
         // toasts
         public static final Component TOAST_RELOAD = Component.translatable(Resources.MOD_ID + ".toast.reload");
         public static final Component TOAST_SAVE_FAILED = Component.translatable(Resources.MOD_ID + ".toast.save.failed");
+        public static final Component TOAST_COPIED = Component.translatable(Resources.MOD_ID + ".toast.copied");
+        public static final Component TOAST_TOOL_TOGGLE = Component.translatable(Resources.MOD_ID + ".toast.tool.toggle");
 
         // widgets
         public static final Component SLIDER_NARRATOR = Component.translatable(Resources.MOD_ID + ".slider.narrator");
@@ -54,10 +56,17 @@ public abstract class Resources {
 
         // options screen
         public static final Component TITLE_OPTIONS = Component.translatable(Resources.MOD_ID + ".title.options");
-        public static final Component OPTION_REGENERATE = Component.translatable(Resources.MOD_ID + ".option.regenerate");
-        public static final Component OPTION_REGENERATE_TOOLTIP = Component.translatable(Resources.MOD_ID + ".option.regenerate.tooltip");
-//        TEMP hidden while none implemented
-//        public static final Text OPTION_EASTER_EGGS = Text.translatable(Resources.MOD_ID + ".option.easter_eggs");
+        public static final Component OPTION_CATEGORY_GENERAL = Component.translatable(Resources.MOD_ID + ".option.category.general");
+        public static final Component OPTION_GENERAL_REGENERATE = Component.translatable(Resources.MOD_ID + ".option.general.regenerate");
+        public static final Component OPTION_GENERAL_REGENERATE_TOOLTIP = Component.translatable(Resources.MOD_ID + ".option.general.regenerate.tooltip");
+        public static final Component OPTION_CATEGORY_COPY = Component.translatable(Resources.MOD_ID + ".option.category.copy");
+        public static final Component OPTION_CATEGORY_COPY_TOOLTIP = Component.translatable(Resources.MOD_ID + ".option.category.copy.tooltip");
+        public static final Component OPTION_COPY_ACTIVE = Component.translatable(Resources.MOD_ID + ".option.copy.active");
+        public static final Component OPTION_COPY_TOOL = Component.translatable(Resources.MOD_ID + ".option.copy.tool");
+        public static final Component OPTION_COPY_TOOL_TOOLTIP = Component.translatable(Resources.MOD_ID + ".option.copy.tool.tooltip");
+////        TEMP hidden while none implemented
+//        public static final Component OPTION_CATEGORY_EASTEREGG = Component.translatable(Resources.MOD_ID + ".option.category.easteregg");
+//        public static final Component OPTION_EASTEREGG_ACTIVE = Component.translatable(Resources.MOD_ID + ".option.easteregg.active");
 
         // confirm screen
         public static final Component CONFIRM_SAVE_TITLE = Component.translatable(Resources.MOD_ID + ".confirm.save.title");

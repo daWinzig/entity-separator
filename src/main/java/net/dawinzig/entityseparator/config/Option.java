@@ -80,7 +80,6 @@ public abstract class Option<T> {
             Int option = getInt(key);
             return option != null ? option.getValue() : defaultValue;
         }
-        @SuppressWarnings("unused") //UNUSED
         public String getValueOrDefault(String defaultValue, String... key) {
             Str option = getStr(key);
             return option != null ? option.getValue() : defaultValue;
