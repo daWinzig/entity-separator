@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(EntityRenderDispatcher.class)
-public class EntityRendererDispatcherMixin {
+public class EntityRenderDispatcherMixin {
     @Unique
     Entity current = null;
 
