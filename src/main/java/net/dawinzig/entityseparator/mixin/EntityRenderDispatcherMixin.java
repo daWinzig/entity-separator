@@ -31,7 +31,7 @@ public class EntityRenderDispatcherMixin {
         current = entity;
     }
 
-    @Redirect(method = "render(Lnet/minecraft/world/entity/Entity;DDDFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/renderer/entity/EntityRenderer;)V",
+    @Redirect(method = "render(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;DDDLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/renderer/entity/EntityRenderer;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;render(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"))
     private void renderRenderRedirect(EntityRenderer<? super Entity,EntityRenderState> entityRenderer, EntityRenderState entityRenderState, PoseStack poseStack, MultiBufferSource multiBufferSource, int light) {
         double d = entityRenderState.distanceToCameraSq;

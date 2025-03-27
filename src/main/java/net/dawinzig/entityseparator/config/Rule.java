@@ -2,21 +2,23 @@ package net.dawinzig.entityseparator.config;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.dawinzig.entityseparator.EntitySeparator;
 import net.minecraft.commands.arguments.NbtPathArgument;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Rule {
     private String name = "New Rule";
-    private final HashSet<EntityType<?>> entityTypes = new HashSet<>();
+    private final HashSet<String> entityTypes = new HashSet<>();
     private NbtPathArgument.NbtPath path = null;
     private boolean inverted = false;
     private boolean compareMode = false;
@@ -26,25 +28,27 @@ public class Rule {
     private String texture = "";
 
     public Rule() {
-        this.entityTypes.add(EntityType.GOAT);
+        this.entityTypes.add(EntityType.getKey(EntityType.GOAT).toString());
         this.setPath("");
     }
     public Rule(CompoundTag nbtCompound) throws IllegalArgumentException {
-        this.name = nbtCompound.getString("name");
-        nbtCompound.getList("entity_types", Tag.TAG_STRING).forEach(id -> {
-            Optional<EntityType<?>> entityType = EntityType.byString((id.getAsString()));
-            entityType.ifPresent(this.entityTypes::add);
+        this.name = nbtCompound.getString("name").orElse("New Rule");
+        nbtCompound.getList("entity_types").orElseGet(ListTag::new).forEach(id -> {
+            String typeID = id.asString().orElse(EntityType.getKey(EntityType.GOAT).toString());
+            Optional<EntityType<?>> entityType = EntityType.byString(typeID);
+            if (entityType.isPresent()) this.entityTypes.add(typeID);
+            else EntitySeparator.LOGGER.error("Failed to load EntityType \"%s\" for Rule \"%s\"".formatted(typeID, this.name));
         });
-        this.setPath(nbtCompound.getString("path"));
-        this.maxDistance = nbtCompound.getInt("distance");
-        this.labelPattern = nbtCompound.getString("pattern");
+        this.setPath(nbtCompound.getString("path").orElse(""));
+        this.maxDistance = nbtCompound.getInt("distance").orElse(32);
+        this.labelPattern = nbtCompound.getString("pattern").orElse("&6Entity matched!");
         if (nbtCompound.contains("compare")) {
             this.compare.addAll(((ListTag) Objects.requireNonNull(nbtCompound.get("compare"))));
             this.compareMode = true;
         }
-        this.inverted = nbtCompound.getBoolean("inverted");
+        this.inverted = nbtCompound.getBoolean("inverted").orElse(false);
         if (nbtCompound.contains("texture"))
-            this.texture = nbtCompound.getString("texture");
+            this.texture = nbtCompound.getString("texture").orElse("");
 
         if (!this.isValid())
             throw new IllegalArgumentException();
@@ -55,7 +59,7 @@ public class Rule {
 
         nbtCompound.putString("name", this.name);
         ListTag entityTypes = new ListTag();
-        this.entityTypes.forEach(entityType -> entityTypes.add(StringTag.valueOf(EntityType.getKey(entityType).toString())));
+        this.entityTypes.forEach(entityType -> entityTypes.add(StringTag.valueOf(entityType)));
         nbtCompound.put("entity_types", entityTypes);
         nbtCompound.putString("path", this.getPath());
         nbtCompound.putInt("distance", this.maxDistance);
@@ -108,36 +112,31 @@ public class Rule {
     }
 
     public boolean containsEntityType(EntityType<?> entityType) {
-        return entityTypes.contains(entityType);
+        return entityTypes.contains(EntityType.getKey(entityType).toString());
     }
     public String getEntityTypes() {
-        String[] arr = new String[this.entityTypes.size()];
-        Iterator<EntityType<?>> itt = this.entityTypes.iterator();
-        for (int i = 0; i < this.entityTypes.size(); i++) {
-            arr[i] = EntityType.getKey(itt.next()).toString();
-        }
-        return String.join("; ", arr);
+        return String.join("; ", entityTypes);
     }
     public void setEntityTypes(String entityTypes) {
         this.entityTypes.clear();
-
         String[] arr = entityTypes.split(";");
-        for (String s : arr) {
-            ResourceLocation identifier = ResourceLocation.tryParse(s.trim());
-            if (identifier != null) {
-                Optional<EntityType<?>> entityType = EntityType.byString(identifier.toString());
-                entityType.ifPresent(this.entityTypes::add);
-            }
-        }
+        this.entityTypes.addAll(Arrays.asList(arr));
     }
     public static boolean isValidEntityTypes(String entityTypes) {
         String[] arr = entityTypes.split(";");
         for (String s : arr) {
-            ResourceLocation identifier = ResourceLocation.tryParse(s.trim());
-            if (identifier != null) {
-                Optional<EntityType<?>> entityType = EntityType.byString(identifier.toString());
-                if (entityType.isEmpty())
-                    return false;
+            if (s.startsWith("#")) {
+                ResourceLocation identifier = ResourceLocation.tryParse(s.substring(1).trim());
+                if (identifier != null) {
+                    TagKey<EntityType<?>> key  = TagKey.create(Registries.ENTITY_TYPE, identifier);
+                    BuiltInRegistries.ENTITY_TYPE.getTagOrEmpty(key);
+                }
+            } else {
+                ResourceLocation identifier = ResourceLocation.tryParse(s.trim());
+                if (identifier != null) {
+                    if (EntityType.byString(identifier.toString()).isEmpty())
+                        return false;
+                }
             }
         }
         return true;
@@ -224,10 +223,10 @@ public class Rule {
 
         Matcher placeholder = Pattern.compile("\\{([^{]*)}").matcher(labelText);
         while (placeholder.find()) {
-            String replacement = "&c[Error]&r";
+            String replacement;
             try {
-                replacement = new NbtPathArgument().parse(new StringReader(placeholder.group(1))).get(nbt).getFirst().getAsString();
-            } catch (CommandSyntaxException|StringIndexOutOfBoundsException ignored) {}
+                replacement = new NbtPathArgument().parse(new StringReader(placeholder.group(1))).get(nbt).getFirst().asString().orElse("&c[Error]&r");
+            } catch (CommandSyntaxException|StringIndexOutOfBoundsException ignored) { continue; }
             labelText = labelText.replace("{" + placeholder.group(1) + "}", replacement);
         }
 
